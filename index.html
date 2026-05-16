@@ -1813,36 +1813,22 @@ async function runResearch() {
 }
 
 async function fetchResearchForState(lead, state, cities) {
-  const prompt = `You are a research assistant for Kathe Petchel, a Business Development Specialist at HINGE Early Education Advisors — a nationally recognized childcare business brokerage and advisory firm.
+  const locationDesc = (cities && cities !== '-')
+    ? cities.split(',').filter(c => c.trim()).join(', ') + ', ' + state
+    : state;
 
-Kathe is preparing to call ${lead.firstName} ${lead.lastName}, owner of ${lead.company}, which operates ${lead.locs || 'multiple'} early education locations in ${cities || state}, ${state}.
+  const prompt = `You are a market intelligence assistant for Kathe Petchel, Business Development Specialist at HINGE Early Education Advisors — the nation's leading early education business brokerage firm.
 
-Your job: Use web search to research this specific region and generate a CALL PREP SHEET that will help Kathe sound like a knowledgeable, credible peer on the call — not a cold caller. She wants to reference local conditions naturally in conversation.
+Kathe is preparing to call ${lead.firstName} ${lead.lastName}, owner of ${lead.company}, which operates ${lead.locs || 'multiple'} early education locations in ${state}.${(cities && cities !== '-') ? ' Known cities/metros: ' + cities + '.' : ' Specific cities are unknown — use the most populated metros in ' + state + ' as your reference.'}
 
-Research these four areas for ${cities ? cities + ', ' : ''}${state}:
+Generate a CALL PREP SHEET with market intelligence for ${locationDesc} across these four areas. If specific city data is unknown, use the major metros in ${state} — do NOT ask for clarification, just proceed with the best available state-level and major-metro data.
 
-1. BUSINESS & ECONOMIC CLIMATE
-   - Recent business news, employer moves, economic growth or contraction
-   - Any notable real estate development, population trends, job market changes
-   - Is the area growing, declining, or stable?
+1. BUSINESS & ECONOMIC CLIMATE — employer growth, major industries, economy health
+2. CHILDCARE REAL ESTATE MARKET — commercial property trends, childcare facility demand
+3. PRESCHOOL & ECE MARKET — competition landscape, ${state} licensing/regulatory environment, enrollment trends, tuition benchmarks
+4. DEMOGRAPHICS & FAMILY TRENDS — birth rates, household income, population growth, family formation
 
-2. CHILDCARE REAL ESTATE MARKET
-   - Commercial property trends, lease rates, cap rates if available
-   - Any childcare facility sales, acquisitions, or notable real estate news
-   - Demand for childcare real estate vs. supply
-
-3. PRESCHOOL & ECE MARKET
-   - Local competition landscape (major operators, chains moving in or out)
-   - State licensing/regulatory environment — any recent changes in ${state}
-   - Demand indicators: waitlists, enrollment trends, tuition benchmarks
-   - Any notable ECE industry news specific to ${state}
-
-4. DEMOGRAPHICS & FAMILY TRENDS
-   - Birth rates, household income, family formation trends
-   - Population growth in the specific metro areas (${cities || state})
-   - Any trends relevant to demand for premium private childcare
-
-OUTPUT FORMAT — return ONLY valid HTML (no markdown, no code fences) structured exactly like this:
+CRITICAL: You MUST return ONLY the HTML block below, fully filled in. No questions. No preamble. No markdown. No code fences. Even if data is limited, make your best effort using ${state} state-level knowledge.
 
 <div class="prep-sheet visible">
   <div class="prep-sheet-header">
@@ -1855,40 +1841,31 @@ OUTPUT FORMAT — return ONLY valid HTML (no markdown, no code fences) structure
 
     <div class="prep-section-title">📰 Business & Economic Climate — ${state}</div>
     <ul class="prep-bullets">
-      <li>[bullet 1 — specific local fact]</li>
-      <li>[bullet 2]</li>
-      <li>[bullet 3]</li>
+      <li>[2-3 specific bullets about the economy, major employers, growth trends]</li>
     </ul>
 
     <div class="prep-section-title">🏠 Childcare Real Estate Market</div>
     <ul class="prep-bullets">
-      <li>[bullet]</li>
+      <li>[2-3 bullets about commercial RE market, childcare facility demand/supply]</li>
     </ul>
 
     <div class="prep-section-title">🏫 Preschool & ECE Market — ${state}</div>
     <ul class="prep-bullets">
-      <li>[bullet]</li>
+      <li>[2-3 bullets: competition, licensing, enrollment trends, tuition benchmarks]</li>
     </ul>
 
     <div class="prep-section-title">👶 Demographics & Family Trends</div>
     <ul class="prep-bullets">
-      <li>[bullet]</li>
+      <li>[2-3 bullets: birth rates, household income, population growth]</li>
     </ul>
 
     <div class="prep-section-title">💬 Suggested Conversation Openers</div>
-    <div class="prep-opener">"[Natural opener Kathe could say that references a local data point — sounds like a peer, not a sales pitch. E.g.: 'I was reading about the new Amazon distribution center opening in your area — that kind of employer growth usually drives demand for quality childcare...']"</div>
+    <div class="prep-opener">"[A natural, peer-to-peer opener referencing a local data point — not salesy]"</div>
     <div class="prep-opener">"[Second opener]"</div>
     <div class="prep-opener">"[Third opener]"</div>
 
   </div>
-</div>
-
-RULES:
-- Be specific. Use real city names, actual stats, named employers, real market data from your search.
-- Each section should have 2-4 bullets. Total: 8-12 intel bullets across all four sections.
-- The conversation openers should sound like something a smart, informed peer would naturally say — NOT a sales pitch.
-- If you can't find specific data for a sub-point, skip it rather than making something up.
-- Return ONLY the HTML block. No preamble, no explanation, no markdown.`;
+</div>`;
 
   const resp = await fetch(getApiUrl(), {
     method: 'POST',
