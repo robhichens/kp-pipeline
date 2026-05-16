@@ -1907,7 +1907,7 @@
 <!-- VALUATION TRIGGERED MEME OVERLAY -->
 <div id="memeOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;flex-direction:column;gap:16px">
   <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);letter-spacing:0.04em">🎉 Valuation Triggered! 🎉</div>
-  <video id="memeVideo" src="assests/grok-video-2d8cfa9f-2fc9-4622-afd6-4ff8eacb9062.mp4" autoplay playsinline style="max-width:70vw;max-height:65vh;border-radius:16px;box-shadow:0 0 60px rgba(139,0,255,0.7),0 0 120px rgba(255,215,0,0.4)"></video>
+  <video id="memeVideo" src="assests/grok-video-2d8cfa9f-2fc9-4622-afd6-4ff8eacb9062.mp4" autoplay playsinline muted style="max-width:70vw;max-height:65vh;border-radius:16px;box-shadow:0 0 60px rgba(139,0,255,0.7),0 0 120px rgba(255,215,0,0.4)"></video>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2170,14 +2170,14 @@ function openModal(id) {
   sel.innerHTML = STAGES.map(s => `<option value="${s.id}" ${l.stage === s.id ? 'selected' : ''}>${s.label}</option>`).join('');
 
   const fields = [
-    ['Email', l.email + (l.altEmail ? ` / ${l.altEmail}` : '')],
+    ['Email', [l.email, l.altEmail].filter(Boolean).map(e => `<a href="mailto:${e}">${e}</a>`).join(' / ') || '—'],
     ['Phone', l.phone || '—'],
     ['Location', (l.city ? l.city + ', ' : '') + l.state],
     ['# Locations', l.locs || '—'],
     ['Licensed Capacity', l.capacity || '—'],
     ['Est. Business Value', l.value || '—'],
     ['Real Estate', l.re || '—'],
-    ['Website', l.website && l.website !== '-' ? `<a href="${l.website}" target="_blank">${l.website}</a>` : '—'],
+    ['Website', l.website && l.website !== '-' ? `<a href="${l.website.startsWith('http') ? l.website : 'https://' + l.website}" target="_blank">${l.website}</a>` : '—'],
     ['List Date', l.listDate || '—'],
     ['Next Steps', l.nextSteps || '—'],
   ];
