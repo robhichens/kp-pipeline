@@ -185,12 +185,16 @@
     background: white;
     border-radius: 14px;
     border: 1px solid var(--border);
-    overflow: hidden;
+    overflow: clip;
     box-shadow: var(--shadow);
   }
   table { width: 100%; border-collapse: collapse; font-size: 15px; }
   thead { background: var(--ink); }
   thead th {
+    position: sticky;
+    top: 84px;
+    z-index: 5;
+    background: var(--ink);
     color: #ccc;
     font-weight: 600;
     font-size: 13px;
