@@ -1005,124 +1005,174 @@ min-height: 40px;
 @media (max-width: 768px) {
 
 ```
-/* HEADER */
+/* HEADER — logo row + nav row */
 header {
   height: auto;
-  padding: 12px 16px;
-  flex-wrap: wrap;
-  gap: 10px;
+  padding: 10px 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
 }
+.header-brand { justify-content: flex-start; }
 .header-logo { font-size: 20px; }
 .header-subtitle { font-size: 11px; }
 .header-divider { display: none; }
-.tab-nav { width: 100%; justify-content: center; gap: 6px; }
+.tab-nav {
+  width: 100%;
+  display: flex;
+  gap: 6px;
+}
 .tab-btn {
-  font-size: 14px;
-  padding: 10px 18px;
   flex: 1;
+  font-size: 14px;
+  padding: 10px 8px;
   text-align: center;
+  min-height: 44px;
 }
 
-/* STATS BAR */
+/* STATS BAR — 3-up grid, no wrapping labels */
 .stats-bar {
-  padding: 16px;
-  gap: 0;
+  padding: 14px 16px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  row-gap: 16px;
+  gap: 14px 0;
 }
 .stat-divider { display: none; }
 .stat { align-items: center; }
-.stat-num { font-size: 24px; }
-.stat-label { font-size: 11px; text-align: center; }
+.stat-num { font-size: 22px; }
+.stat-label { font-size: 10px; text-align: center; letter-spacing: 0.05em; }
+
+/* Search/filter/toggle row */
 .stats-search {
   margin-left: 0;
   grid-column: 1 / -1;
-  flex-direction: column;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
   width: 100%;
-  gap: 10px;
 }
-.search-input { width: 100%; font-size: 16px; }
-.filter-select { width: 100%; font-size: 16px; }
-.view-toggle { margin-left: 0; align-self: flex-end; }
-
-/* PIPELINE TABLE — swap to card layout */
-.pipeline-container { padding: 16px; }
-.table-wrap { border-radius: 10px; overflow-x: auto; }
-table { font-size: 14px; min-width: 600px; }
-thead th { padding: 12px 12px; font-size: 11px; }
-td { padding: 12px 12px; }
-.lead-name { font-size: 14px; }
-.lead-company { font-size: 12px; }
-
-/* KANBAN — single column scroll */
-.kanban-container { padding: 14px 12px 28px; overflow-x: auto; }
-.kanban-board {
-  gap: 12px;
-  /* Allow natural horizontal scroll, columns stay full width */
+.search-input {
+  flex: 1 1 100%;
+  width: 100%;
+  font-size: 16px;
+  padding: 11px 14px;
 }
-.kanban-col { width: 80vw; max-width: 320px; flex-shrink: 0; }
+.filter-select {
+  flex: 1 1 auto;
+  font-size: 15px;
+  min-height: 44px;
+}
+.view-toggle { margin-left: 0; flex-shrink: 0; }
+
+/* PIPELINE — hide table, show mobile cards instead */
+.pipeline-container { padding: 14px 14px; }
+.table-wrap { display: none; }
+#mobileCardList { display: flex; flex-direction: column; gap: 10px; }
+
+/* KANBAN — swipe horizontally */
+.kanban-container { padding: 12px 12px 28px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.kanban-board { gap: 12px; }
+.kanban-col { width: 82vw; max-width: 300px; flex-shrink: 0; }
 .kanban-card { padding: 14px; }
 .kanban-card-name { font-size: 15px; }
 .kanban-card-company { font-size: 13px; }
 
-/* MODAL */
+/* MODAL — bottom sheet */
+.modal-overlay { align-items: flex-end; }
 .modal {
   width: 100%;
   max-width: 100%;
-  max-height: 95vh;
-  border-radius: 18px 18px 0 0;
-  margin-top: auto;
+  max-height: 92vh;
+  border-radius: 20px 20px 0 0;
 }
-.modal-overlay { align-items: flex-end; }
-.modal-header { padding: 20px 20px 14px; }
+.modal-header { padding: 18px 18px 12px; }
 .modal-title { font-size: 22px; }
 .modal-company { font-size: 14px; }
-.modal-tabs { padding: 0 16px; overflow-x: auto; white-space: nowrap; }
-.modal-tab-btn { font-size: 14px; padding: 12px 14px; }
-.modal-tab-panel { padding: 20px 18px; }
-.modal-grid { grid-template-columns: 1fr; gap: 12px; }
+.modal-close { min-width: 44px; min-height: 44px; }
+.modal-tabs { padding: 0 14px; overflow-x: auto; white-space: nowrap; }
+.modal-tab-btn { font-size: 14px; padding: 12px 14px; min-height: 48px; }
+.modal-tab-panel { padding: 18px 16px; }
+.modal-grid { grid-template-columns: 1fr; gap: 10px; }
 .edit-grid { grid-template-columns: 1fr; }
 .stage-select-wrap { flex-direction: column; align-items: flex-start; }
-.stage-select { width: 100%; }
-.btn-primary, .btn-secondary, .btn-save, .btn-cancel {
+.stage-select { width: 100%; min-height: 48px; font-size: 16px; }
+.btn-primary, .btn-secondary, .btn-save {
+  display: block;
   width: 100%;
   margin-left: 0;
   font-size: 17px;
-  padding: 15px;
+  padding: 16px;
+  min-height: 54px;
+  margin-top: 10px;
+  text-align: center;
 }
-.edit-actions { flex-direction: column; }
+.btn-cancel {
+  display: block;
+  width: 100%;
+  margin-left: 0;
+  font-size: 16px;
+  padding: 14px;
+  min-height: 48px;
+  text-align: center;
+}
+.edit-actions { flex-direction: column; gap: 8px; }
+.print-btn { min-height: 40px; font-size: 14px; }
 
 /* EMAIL GENERATOR */
-.email-container {
-  grid-template-columns: 1fr;
-  padding: 16px;
-  gap: 20px;
-}
-.email-form-card {
-  position: static;
-  padding: 20px;
-}
+.email-container { grid-template-columns: 1fr; padding: 14px; gap: 18px; }
+.email-form-card { position: static; padding: 18px; }
 .email-form-title { font-size: 20px; }
+.form-group { margin-bottom: 16px; }
 .form-group select,
 .form-group input,
-.form-group textarea { font-size: 16px; }
-.generate-btn { font-size: 18px; padding: 18px; min-height: 60px; }
-.email-output-card { padding: 20px; }
-.copy-btn { width: 100%; justify-content: center; font-size: 16px; padding: 14px; }
-.email-content { font-size: 15px; }
+.form-group textarea { font-size: 16px; min-height: 48px; }
+.generate-btn { font-size: 18px; padding: 18px; min-height: 58px; }
+.email-output-card { padding: 18px; }
+.copy-btn { display: block; width: 100%; text-align: center; font-size: 16px; padding: 14px; }
+.email-content { font-size: 15px; padding: 16px; }
+.email-output-header { flex-direction: column; gap: 12px; align-items: flex-start; }
 
-/* RESEARCH TAB */
-.research-header { flex-direction: column; align-items: flex-start; gap: 12px; }
-.research-actions { width: 100%; flex-direction: column; }
+/* RESEARCH */
+.research-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+.research-actions { width: 100%; flex-direction: column; gap: 8px; }
 .btn-research { width: 100%; justify-content: center; font-size: 16px; min-height: 52px; }
-.btn-copy-research { width: 100%; justify-content: center; }
-.prep-sheet-title { font-size: 15px; }
-.prep-bullets li { font-size: 14px; }
-.prep-opener { font-size: 14px; }
+.btn-copy-research { width: 100%; justify-content: center; min-height: 48px; }
 
-/* ROW COUNT */
-.row-count { font-size: 13px; padding: 0 0 8px; }
+/* MOBILE LEAD CARDS */
+.m-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.m-card:active { box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.m-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.m-card-name { font-weight: 700; font-size: 17px; color: var(--ink); line-height: 1.2; }
+.m-card-company { font-size: 14px; color: var(--muted); font-weight: 500; margin-top: 2px; }
+.m-card-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.m-card-actions { display: flex; gap: 8px; margin-top: 4px; }
+.m-card-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 8px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  min-height: 44px;
+}
+.m-card-btn-view { background: var(--ink); color: white; }
+.m-card-btn-edit { background: var(--amber-light); color: var(--amber); border: 1px solid #e8c080; }
+.m-card-btn-email { background: var(--green-light); color: var(--green); border: 1px solid #80c8a0; }
 ```
 
 }
@@ -1130,9 +1180,9 @@ td { padding: 12px 12px; }
 /* Extra small phones */
 @media (max-width: 390px) {
 .stats-bar { grid-template-columns: 1fr 1fr; }
-.stat:last-of-type { grid-column: 1 / -1; }
 .kanban-col { width: 88vw; }
-.tab-btn { font-size: 13px; padding: 9px 12px; }
+.tab-btn { font-size: 13px; padding: 9px 8px; }
+.stat-num { font-size: 20px; }
 }
 
 @media print {
@@ -1268,6 +1318,7 @@ header, .stats-bar, .tab-nav, .view-toggle,
       </table>
       <div class="empty-state" id="emptyState" style="display:none">No leads match your search.</div>
     </div>
+    <div id="mobileCardList" style="display:none"></div>
   </div>
   <div class="kanban-container" id="kanbanView" style="display:none">
     <div class="kanban-board" id="kanbanBoard"></div>
@@ -1674,7 +1725,15 @@ function renderTable() {
 
   const tbody = document.getElementById('leadsTableBody');
   const empty = document.getElementById('emptyState');
+  const mobileList = document.getElementById('mobileCardList');
   document.getElementById('rowCount').textContent = `Showing ${filtered.length} of ${leads.length} leads`;
+
+  // On mobile, show cards instead of table
+  if (isMobile()) {
+    if (mobileList) { mobileList.style.display = 'flex'; renderMobileCards(filtered); }
+    return;
+  }
+  if (mobileList) mobileList.style.display = 'none';
 
   if (filtered.length === 0) {
     tbody.innerHTML = '';
@@ -1710,6 +1769,43 @@ function renderTable() {
         <button class="action-btn email-btn" onclick="openEmailForLeadId(${l.id})">Email</button>
       </td>
     </tr>`;
+  }).join('');
+}
+
+function isMobile() { return window.innerWidth <= 768; }
+
+function renderMobileCards(filtered) {
+  const list = document.getElementById('mobileCardList');
+  if (!list) return;
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">No leads match your search.</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(l => {
+    const cls = getStageCls(l.stage);
+    const stageLabel = getStageLabel(l.stage);
+    const hasValue = l.value && l.value !== '-' && l.value !== 'N/A';
+    const hasRE = l.re && l.re.toLowerCase().includes('own');
+    return `<div class="m-card" onclick="openModal(${l.id})">
+      <div class="m-card-top">
+        <div>
+          <div class="m-card-name">${l.firstName} ${l.lastName}</div>
+          <div class="m-card-company">${l.company}</div>
+        </div>
+        <span class="badge ${cls}" style="flex-shrink:0"><span class="badge-dot"></span>${stageLabel}</span>
+      </div>
+      <div class="m-card-pills">
+        <span class="loc-count">${l.locs || '?'} loc</span>
+        ${hasValue ? `<span class="value-pill">${l.value}</span>` : ''}
+        ${hasRE ? `<span class="re-owned">✓ RE</span>` : ''}
+        <span style="font-size:13px;color:var(--muted)">${l.city ? l.city + ', ' : ''}${l.state}</span>
+      </div>
+      <div class="m-card-actions" onclick="event.stopPropagation()">
+        <button class="m-card-btn m-card-btn-view" onclick="openModal(${l.id})">View</button>
+        <button class="m-card-btn m-card-btn-edit" onclick="openModalTab(${l.id},'edit')">Edit</button>
+        <button class="m-card-btn m-card-btn-email" onclick="openEmailForLeadId(${l.id})">✉ Email</button>
+      </div>
+    </div>`;
   }).join('');
 }
 
@@ -2525,6 +2621,10 @@ initLeads();
 updateStats();
 renderTable();
 populateEmailLeadSelect();
+// Re-render on resize (mobile <-> desktop switch)
+window.addEventListener('resize', () => {
+  if (currentView === 'table') renderTable();
+});
 </script>
 
 </body>
