@@ -2,11 +2,6 @@
  * Netlify Function: claude.js
  * Proxies requests from the browser to the Anthropic API.
  * The API key lives only in Netlify's environment — never in the browser.
- *
- * SETUP:
- * In your Netlify dashboard → Site → Environment variables → Add variable:
- *   Key:   ANTHROPIC_API_KEY
- *   Value: sk-ant-xxxxxxxxxxxxxxxx   (your key from console.anthropic.com)
  */
 
 export default async (request, context) => {
@@ -30,7 +25,7 @@ export default async (request, context) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: { message: 'ANTHROPIC_API_KEY environment variable is not set. Add it in Netlify → Site → Environment variables.' } }),
+      JSON.stringify({ error: { message: 'ANTHROPIC_API_KEY environment variable is not set.' } }),
       { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
     );
   }
@@ -41,6 +36,15 @@ export default async (request, context) => {
   } catch {
     return new Response('Invalid JSON body', { status: 400 });
   }
+
+  // Remove web_search tool — it causes multi-round-trip latency that exceeds
+  // Netlify function timeouts. Claude's training knowledge covers state-level
+  // ECE market intelligence well enough for call prep purposes.
+  if (body.tools) {
+    delete body.tools;
+  }
+  // Cap tokens to keep response well under timeout
+  body.max_tokens = Math.min(body.max_tokens || 1500, 1500);
 
   const anthropicResp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
