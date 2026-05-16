@@ -1001,8 +1001,61 @@
   .print-btn:hover { border-color: var(--ink); color: var(--ink); }
 
   @media print {
-    header, .stats-bar, .tab-nav, .modal-tabs, .research-actions, .edit-actions { display: none !important; }
-    .modal { box-shadow: none; border: none; }
+    /* Hide everything except the modal content */
+    body > *:not(#printRoot) { display: none !important; }
+    header, .stats-bar, .tab-nav, .view-toggle,
+    .modal-tabs, .modal-close, .print-btn,
+    .research-actions, .edit-actions,
+    .stage-select-wrap, .notes-input,
+    .btn-primary, .btn-secondary, .saved-msg,
+    .modal-overlay { display: none !important; }
+
+    /* Make the print root fill the page */
+    #printRoot {
+      display: block !important;
+      position: fixed !important;
+      inset: 0 !important;
+      background: white !important;
+      z-index: 99999 !important;
+      padding: 32px 40px !important;
+      font-family: 'Inter', Arial, sans-serif !important;
+      font-size: 13pt !important;
+      color: #000 !important;
+      overflow: visible !important;
+    }
+
+    #printRoot h1 { font-size: 22pt; margin-bottom: 4px; }
+    #printRoot h2 { font-size: 13pt; color: #444; margin-bottom: 16px; font-weight: 400; }
+    #printRoot .print-section { margin-bottom: 18px; }
+    #printRoot .print-label {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #666;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    #printRoot .print-value { font-size: 12pt; color: #000; font-weight: 600; margin-bottom: 10px; }
+    #printRoot .print-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin-bottom: 16px; }
+    #printRoot .print-note-block {
+      background: #f5f5f5;
+      border-left: 3px solid #b8860b;
+      padding: 10px 14px;
+      font-size: 11pt;
+      line-height: 1.6;
+      margin-bottom: 8px;
+      white-space: pre-wrap;
+      color: #111;
+    }
+    #printRoot .print-divider {
+      border: none;
+      border-top: 1px solid #ccc;
+      margin: 16px 0;
+    }
+    #printRoot .prep-sheet-header { background: #1a1a2e !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #printRoot .prep-bullets li { font-size: 11pt; }
+    #printRoot .prep-opener { font-size: 11pt; }
+    #printRoot .prep-section-title { font-size: 9pt; }
   }
 </style>
 </head>
@@ -1175,7 +1228,7 @@
         <div class="modal-company" id="modalCompany"></div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="print-btn" onclick="printLead()">🖨 Print</button>
         <button class="modal-close" onclick="closeModal()">✕</button>
       </div>
     </div>
@@ -2245,6 +2298,80 @@ function onDrop(e) {
   }
 
   draggedId = null;
+}
+
+// ==================== PRINT ====================
+function printLead() {
+  if (currentLeadIdx === null) return;
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l) return;
+
+  // Determine what to print based on active tab
+  const isPrepSheet = activeModalTab === 'research';
+
+  // Remove any existing print root
+  const existing = document.getElementById('printRoot');
+  if (existing) existing.remove();
+
+  const root = document.createElement('div');
+  root.id = 'printRoot';
+  root.style.display = 'none'; // hidden until print
+
+  if (isPrepSheet && l.researchSheets && Object.keys(l.researchSheets).length > 0) {
+    // Print all state prep sheets stacked
+    const states = Object.keys(l.researchSheets);
+    root.innerHTML = `
+      <h1>${l.firstName} ${l.lastName}</h1>
+      <h2>${l.company} &nbsp;·&nbsp; ${l.city || ''} ${l.state || ''}</h2>
+      <hr style="border:none;border-top:2px solid #b8860b;margin-bottom:20px">
+      ${states.map(s => l.researchSheets[s] || '').join('<hr style="border:none;border-top:1px dashed #ccc;margin:24px 0">')}
+    `;
+  } else {
+    // Print overview
+    const allAddedNotes = (l.addedNotes || []).map(n => `[${n.date}] ${n.text}`).join('\n\n');
+    const stage = STAGES.find(s => s.id === l.stage)?.label || l.stage;
+
+    const fields = [
+      ['Email', l.email + (l.altEmail ? ' / ' + l.altEmail : '')],
+      ['Phone', l.phone || '—'],
+      ['Location', (l.city ? l.city + ', ' : '') + l.state],
+      ['# Locations', l.locs || '—'],
+      ['Licensed Capacity', l.capacity || '—'],
+      ['Est. Business Value', l.value || '—'],
+      ['Real Estate', l.re || '—'],
+      ['Website', l.website && l.website !== '-' ? l.website : '—'],
+      ['List Date', l.listDate || '—'],
+      ['Next Steps', l.nextSteps || '—'],
+    ];
+
+    root.innerHTML = `
+      <h1>${l.firstName} ${l.lastName}</h1>
+      <h2>${l.company}${l.title ? ' &nbsp;·&nbsp; ' + l.title : ''}</h2>
+      <div style="display:inline-block;background:#1a1a2e;color:white;padding:4px 14px;border-radius:20px;font-size:11pt;font-weight:700;margin-bottom:20px">${stage}</div>
+      <hr class="print-divider">
+      <div class="print-grid">
+        ${fields.map(([lbl, val]) => `
+          <div class="print-section">
+            <div class="print-label">${lbl}</div>
+            <div class="print-value">${val}</div>
+          </div>
+        `).join('')}
+      </div>
+      <hr class="print-divider">
+      ${l.researchNotes ? `<div class="print-label">Research Notes</div><div class="print-note-block">${l.researchNotes}</div>` : ''}
+      ${l.outreachNotes ? `<div class="print-label">Outreach Notes</div><div class="print-note-block">${l.outreachNotes}</div>` : ''}
+      ${l.followUpNotes ? `<div class="print-label">Follow-Up Notes</div><div class="print-note-block">${l.followUpNotes}</div>` : ''}
+      ${l.otherNotes ? `<div class="print-label">Other Notes</div><div class="print-note-block">${l.otherNotes}</div>` : ''}
+      ${allAddedNotes ? `<div class="print-label">Added Notes</div><div class="print-note-block">${allAddedNotes}</div>` : ''}
+      <hr class="print-divider">
+      <div style="font-size:9pt;color:#999;margin-top:8px">HINGE Advisors · Printed ${new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'})}</div>
+    `;
+  }
+
+  document.body.appendChild(root);
+  window.print();
+  // Clean up after print dialog closes
+  setTimeout(() => root.remove(), 1000);
 }
 
 // ==================== INIT ====================
