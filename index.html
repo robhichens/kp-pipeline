@@ -2623,68 +2623,92 @@ async function generateEmail() {
     'voicemail': 'Kathe left a voicemail but did not speak with the owner.',
     'no-number': 'Kathe could not reach the owner — no good direct number was available.',
     'declined': 'The call was screened or declined by an auto-system; Kathe was not able to leave a message.',
-    'connected': 'Kathe connected and had a conversation with the owner or a key contact.',
+    'connected': 'Kathe connected and had a real conversation with the owner or a key contact.',
     'email-only': 'No call was attempted — this is an email-only outreach.',
   };
 
-  const reContext = re === 'yes' ? 'The owner is known to own their real estate — include the real estate angle.' :
-                    re === 'no' ? 'Real estate ownership is not confirmed — omit the real estate angle.' :
-                    'Real estate ownership is unknown — mention it briefly and naturally as a possibility.';
+  const isConnected = outcome === 'connected';
+  const notesText = notes || '';
 
   const valueContext = (value && value !== 'unknown' && value !== '-')
-    ? `The estimated business value range for this school is ${value}. IMPORTANT: You MUST include this exact value range in the email verbatim.`
-    : `No specific business value estimate is available. Do NOT invent a number. Instead, reference that HINGE's research team has analyzed schools of similar size, tuition structure, and occupancy levels to determine value ranges, and invite them to receive their personalized estimate through the free valuation.`;
+    ? `Estimated business value on file: ${value}. You MUST include this exact range verbatim in the email.`
+    : isConnected
+      ? `No specific value estimate on file. Do NOT use generic "our research team has analyzed schools of similar size" language — that sounds cold after a real conversation. Frame the free valuation as something Kathe would love to put together specifically for ${firstName} based on what they shared.`
+      : `No specific value estimate available. Do NOT invent a number. Frame the free valuation as a personalized offer HINGE would love to prepare for them.`;
 
-  const prompt = `You are drafting a professional, warm, and personalized follow-up email on behalf of Kathe Petchel, Business Development Specialist at HINGE Early Education Advisors.
+  const openingRule = isConnected
+    ? `OPENING (CRITICAL — this is the most important instruction):
+Paragraph 1 MUST open with a SPECIFIC detail pulled directly from the call notes — something ${firstName} said, a plan you made together, something about their business that stood out. Do NOT start with "Thank you for speaking with me" or any generic opener. Start as if picking up mid-conversation. The reader should feel immediately recognized, not like one of many calls Kathe made that day.
+Good example style: "That tour of your three locations before school starts — I've already been looking forward to it." or "I've been thinking about what you said regarding succession planning — it's exactly the kind of conversation HINGE loves to be part of."
+Pull the specific hook from the notes below.`
+    : `OPENING: 1-2 sentences max. Briefly acknowledge you weren't able to connect by phone (or are reaching out by email), introduce yourself and HINGE in one natural sentence, then move immediately to why you're reaching out. Don't linger here.`;
 
-ABOUT HINGE: HINGE Early Education Advisors is a nationally recognized childcare business and real estate brokerage firm. They have 22+ years of experience in early education. They have closed more ECE school transactions than any other firm in the nation. They offer a free, no-strings market and growth valuation to multi-site preschool owners. They also run the BOOST nonprofit (supporting ECE teachers in financial crisis) and hold the annual SHIFT Conference.
+  const ctaRule = isConnected && notesText
+    ? `CLOSING: Reference a specific next step from the notes if one exists (an upcoming visit, a scheduled call, something discussed). Make it feel like a natural continuation, not a generic sign-off. Then include the required "Happy to hop on a 10-minute call" phrase.`
+    : `CLOSING: Keep it brief and non-pushy. Include the required "Happy to hop on a 10-minute call" phrase.`;
 
-SENDER INFO:
-- Name: Kathe Petchel
-- Title: Business Development Specialist
-- Email: kpetchel@hingeadvisors.com
-- Phone: (434) 962-2541
+  const sellingCaveat = isConnected && notesText && /interest|valuation|sell|succession|acqui|transition/i.test(notesText)
+    ? `IMPORTANT: Because ${firstName} has already expressed interest in a valuation or business transition, do NOT lead with "if you're not interested in selling" — place that required phrase later and frame it around the growth intelligence value, not the selling hesitation.`
+    : '';
+
+  const reRule = re === 'yes'
+    ? `Real estate: Owner is confirmed to own their real estate. Include verbatim: "Also, if you own your real estate, there are opportunities we can provide to assist you in selling or leasing, which typically increases your return."`
+    : re === 'no'
+      ? `Real estate: Ownership not confirmed — omit the real estate angle entirely.`
+      : `Real estate: Unknown — mention briefly and naturally as a possibility, don't force it.`;
+
+  const prompt = `You are writing a follow-up email for Kathe Petchel, Business Development Specialist at HINGE Early Education Advisors. Kathe is a childcare owner herself — her voice is warm, direct, peer-to-peer. Never salesy.
+
+━━━ START HERE: KATHE'S CALL & RESEARCH NOTES ━━━
+${notesText || 'No notes — write a concise, warm cold outreach based on lead info below.'}
+
+Before writing, extract from the notes:
+1. The most specific personal or business detail about ${firstName} (history, what stood out, what they said)
+2. Any goal or interest they expressed (acquisition, succession, growth, valuation curiosity, expansion)
+3. Any concrete next step discussed (a tour, a call, a visit, a follow-up)
+Build the entire email around what you found. If notes are sparse, use lead info below.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CALL OUTCOME: ${outcomeDescriptions[outcome]}
 
 LEAD INFO:
 - First name: ${firstName}
 - Company: ${company}
 - Number of locations: ${locs || 'unknown'}
 - ${valueContext}
-- Real estate: ${reContext}
+- ${reRule}
 
-CALL OUTCOME: ${outcomeDescriptions[outcome]}
+HINGE CONTEXT (for natural use — not to be recited as a block):
+HINGE Early Education Advisors — nationally recognized ECE brokerage, 22+ years, more closed transactions than any other firm in the nation. Free no-strings market and growth valuation for multi-site owners. Also runs the BOOST nonprofit (supporting ECE teachers in financial crisis) and hosts the annual SHIFT Conference.
 
-KATHE'S NOTES FROM RESEARCH AND OUTREACH:
-${notes || 'No additional notes.'}
+SENDER: Kathe Petchel | Business Development Specialist | kpetchel@hingeadvisors.com | (434) 962-2541
 
-EMAIL REQUIREMENTS:
-1. The email MUST naturally include these exact phrases (verbatim, no paraphrasing):
-   - "we've been serving Early Education customers nationwide for 22 years"
-   - "we would love to offer you a free market and growth valuation, which will affirm your value numbers"
-   - "if you're not interested in selling at this point, the valuation will also give you key growth information"
-   - "Happy to hop on a 10-minute call to share additional information and answer questions if it makes sense for you."
-   ${value && value !== 'unknown' && value !== '-' ? `- "your business could be worth between ${value}" (use this exact value range)` : ''}
+━━━ EMAIL STRUCTURE ━━━
+${openingRule}
 
-2. If the call outcome is voicemail, email-only, declined, or no-number, include a natural reference near the top explaining the attempted call (e.g. "I just tried to reach you" or "I was unable to get through").
+MIDDLE (1-2 paragraphs): Introduce HINGE's value and weave in the required phrases naturally. CRITICAL: Do NOT cluster all required phrases into a single paragraph — spread them across at least two paragraphs so the email reads as a conversation, not a checklist.
 
-3. If real estate ownership is confirmed, include this phrase: "Also, if you own your real estate, there are opportunities we can provide to assist you in selling or leasing, which typically increases your return."
+${ctaRule}
+${sellingCaveat ? '\n' + sellingCaveat : ''}
 
-4. The email should feel personal, not generic. Reference specific details from the notes — the owner's name, their school, any personal connection or context Kathe gathered.
+━━━ REQUIRED VERBATIM PHRASES (must all appear, spread across paragraphs) ━━━
+- "we've been serving Early Education customers nationwide for 22 years"
+- "we would love to offer you a free market and growth valuation, which will affirm your value numbers"
+- "if you're not interested in selling at this point, the valuation will also give you key growth information"
+- "Happy to hop on a 10-minute call to share additional information and answer questions if it makes sense for you."
+${value && value !== 'unknown' && value !== '-' ? `- "your business could be worth between ${value}" (use this exact range verbatim)` : ''}
 
-5. Sign off as Kathe Petchel, not Tom Wood.
-
-6. End with these three links on separate lines (include them exactly):
+━━━ RULES ━━━
+- Subject line: specific to this lead and conversation — never generic
+- Tone: warm, peer-to-peer, confident. Not pushy. Relationship-building, not closing.
+- Length: 3-4 short paragraphs. No filler. No fluff.
+- Sign off as Kathe Petchel
+- End with these three links on separate lines:
 https://hingeadvisors.com/
 https://www.boostbyhinge.org/
 SHIFT Conference recap: https://youtu.be/yfTrW8psDF0?si=Jk8EOEBPMs_2-gTb
 
-7. Tone: warm, peer-to-peer (Kathe is also a childcare owner), confident, professional. NOT salesy or pushy. The goal is relationship-building, not closing.
-
-8. Length: concise. 3-5 short paragraphs. No fluff.
-
-9. Start with "Subject: [subject line]" on the first line, then a blank line, then the email body.
-
-Write only the email — subject line first, then the body. No commentary, no preamble, no explanation.`;
+Start with "Subject: [subject line]" then a blank line then the email. Write only the email — no commentary, no preamble.`;
 
   try {
     const resp = await fetch(getApiUrl(), {
