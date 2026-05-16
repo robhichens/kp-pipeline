@@ -1195,10 +1195,8 @@
     /* Make the print root fill the page */
     #printRoot {
       display: block !important;
-      position: fixed !important;
-      inset: 0 !important;
+      position: relative !important;
       background: white !important;
-      z-index: 99999 !important;
       padding: 32px 40px !important;
       font-family: 'Inter', Arial, sans-serif !important;
       font-size: 13pt !important;
@@ -1238,6 +1236,73 @@
     #printRoot .prep-bullets li { font-size: 11pt; }
     #printRoot .prep-opener { font-size: 11pt; }
     #printRoot .prep-section-title { font-size: 9pt; }
+  }
+
+  /* EMAIL LOG */
+  .email-log-empty {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .email-log-entry {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: #faf7f3;
+  }
+  .email-log-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .email-log-date {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .email-log-outcome {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 6px;
+    border: 1px solid #a8c8e8;
+  }
+  .email-log-copy {
+    margin-left: auto;
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 7px;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    min-height: 32px;
+    transition: background 0.15s;
+  }
+  .email-log-copy:hover { background: #123f28; }
+  .email-log-subject {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .email-log-body {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-wrap;
+    font-family: var(--font);
   }
 </style>
 </head>
@@ -1420,6 +1485,7 @@
       <button class="modal-tab-btn active" onclick="switchModalTab('overview')">📋 Overview</button>
       <button class="modal-tab-btn" onclick="switchModalTab('edit')">✏️ Edit</button>
       <button class="modal-tab-btn" onclick="switchModalTab('research')">🔍 Research & Call Prep</button>
+      <button class="modal-tab-btn" onclick="switchModalTab('emails')">📧 Email Log</button>
     </div>
 
     <!-- TAB: OVERVIEW -->
@@ -1571,6 +1637,11 @@
 
       <!-- Prep sheet output (one per state, toggled by state tabs) -->
       <div id="researchOutput"></div>
+    </div>
+
+    <!-- TAB: EMAIL LOG -->
+    <div class="modal-tab-panel" id="mtab-emails">
+      <div id="emailLogContent"></div>
     </div>
 
   </div>
@@ -1808,17 +1879,28 @@ function sortBy(key) {
 // ==================== MODAL ====================
 let activeModalTab = 'overview';
 let researchData = {}; // keyed by leadId -> { states: { stateName: htmlContent } }
+let stateResearchCache = {}; // keyed by state abbreviation -> html (shared across all leads)
+
+function loadStateCache() {
+  const stored = localStorage.getItem('hingeStateResearch_v1');
+  stateResearchCache = stored ? JSON.parse(stored) : {};
+}
+
+function saveStateCache() {
+  localStorage.setItem('hingeStateResearch_v1', JSON.stringify(stateResearchCache));
+}
 
 function switchModalTab(tab) {
   activeModalTab = tab;
   document.querySelectorAll('.modal-tab-btn').forEach((b,i) => {
-    b.classList.toggle('active', ['overview','edit','research'][i] === tab);
+    b.classList.toggle('active', ['overview','edit','research','emails'][i] === tab);
   });
   document.querySelectorAll('.modal-tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('mtab-' + tab).classList.add('active');
 
   if (tab === 'edit') populateEditFields();
   if (tab === 'research') initResearchTab();
+  if (tab === 'emails') renderEmailLog();
 }
 
 function openModal(id) {
@@ -1987,13 +2069,26 @@ function initResearchTab() {
   const states = parseStates(l.state);
   renderStateTabs(states);
 
-  const saved = l.researchSheets;
+  let saved = l.researchSheets;
+
+  // If no lead-specific sheets, check the shared state cache for any matching states
+  if (!saved || Object.keys(saved).length === 0) {
+    const fromCache = {};
+    states.forEach(s => { if (stateResearchCache[s]) fromCache[s] = stateResearchCache[s]; });
+    if (Object.keys(fromCache).length > 0) {
+      l.researchSheets = fromCache;
+      saveLeads();
+      saved = fromCache;
+    }
+  }
+
   if (saved && Object.keys(saved).length > 0) {
     document.getElementById('researchPlaceholder').style.display = 'none';
     document.getElementById('researchLoading').classList.remove('visible');
     document.getElementById('copyResearchBtn').classList.add('visible');
     document.getElementById('researchBtnLabel').textContent = 'Re-run Research';
     renderSavedResearch(saved, states[0]);
+    renderStateTabs(states);
   } else {
     document.getElementById('researchPlaceholder').style.display = 'block';
     document.getElementById('researchOutput').innerHTML = '';
@@ -2063,6 +2158,8 @@ async function runResearch() {
     try {
       const html = await fetchResearchForState(l, state, relevantCities);
       l.researchSheets[state] = html;
+      stateResearchCache[state] = html;
+      saveStateCache();
     } catch(e) {
       console.error("Research error for", state, e);
       l.researchSheets[state] = `<div class="research-placeholder"><strong>Error for ${state}:</strong><br><code style="font-size:11px;color:#c00">${e.message}</code><br><br>Open the browser console (F12) for full details. Try again.</div>`;
@@ -2168,6 +2265,36 @@ CRITICAL: You MUST return ONLY the HTML block below, fully filled in. No questio
   }
 
   return html;
+}
+
+// ==================== EMAIL LOG ====================
+function renderEmailLog() {
+  const l = leads.find(x => x.id === currentLeadIdx);
+  const container = document.getElementById('emailLogContent');
+  if (!l || !l.emailLog || l.emailLog.length === 0) {
+    container.innerHTML = '<div class="email-log-empty">No emails logged yet for this lead.<br>Generate an email from the Email tab to log it here automatically.</div>';
+    return;
+  }
+  const entries = [...l.emailLog].reverse(); // newest first
+  container.innerHTML = entries.map((e, i) => {
+    const origIdx = l.emailLog.length - 1 - i;
+    return `
+      <div class="email-log-entry">
+        <div class="email-log-meta">
+          <span class="email-log-date">${e.date}</span>
+          <span class="email-log-outcome">${e.outcome}</span>
+          <button class="email-log-copy" onclick="copyEmailLogEntry(${origIdx})">Copy</button>
+        </div>
+        ${e.subject ? `<div class="email-log-subject">${e.subject}</div>` : ''}
+        <div class="email-log-body">${e.text}</div>
+      </div>`;
+  }).join('');
+}
+
+function copyEmailLogEntry(idx) {
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l || !l.emailLog || !l.emailLog[idx]) return;
+  navigator.clipboard.writeText(l.emailLog[idx].text).then(() => showToast('Email copied!'));
 }
 
 function copyResearch() {
@@ -2318,6 +2445,28 @@ Write only the email — subject line first, then the body. No commentary, no pr
     document.getElementById('emailContent').textContent = text;
     document.getElementById('emailContent').classList.add('visible');
     document.getElementById('copyBtn').classList.add('visible');
+
+    // Save to lead's email log if a lead is selected
+    const selectedLeadId = document.getElementById('emailLeadSelect').value;
+    if (selectedLeadId !== '') {
+      const logLead = leads.find(x => x.id === parseInt(selectedLeadId));
+      if (logLead) {
+        if (!logLead.emailLog) logLead.emailLog = [];
+        const outcomeLabels = {
+          'voicemail': 'Left Voicemail', 'no-number': 'No Good Number',
+          'declined': 'Call Screened', 'connected': 'Had Conversation', 'email-only': 'Email Only'
+        };
+        const subjectMatch = text.match(/^Subject:\s*(.+)/m);
+        logLead.emailLog.push({
+          date: new Date().toLocaleString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }),
+          outcome: outcomeLabels[outcome] || outcome,
+          subject: subjectMatch ? subjectMatch[1].trim() : '',
+          text
+        });
+        saveLeads();
+        showToast('Email generated & saved to log!');
+      }
+    }
   } catch (e) {
     document.getElementById('emailContent').textContent = 'Error connecting to Claude API. Please try again.';
     document.getElementById('emailContent').classList.add('visible');
@@ -2603,6 +2752,7 @@ function printLead() {
 
 // ==================== INIT ====================
 initLeads();
+loadStateCache();
 updateStats();
 renderTable();
 populateEmailLeadSelect();
