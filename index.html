@@ -2694,7 +2694,7 @@ ${sellingCaveat ? '\n' + sellingCaveat : ''}
 ━━━ REQUIRED VERBATIM PHRASES (must all appear, spread across paragraphs) ━━━
 - "we've been serving Early Education customers nationwide for 22 years"
 - "we would love to offer you a free market and growth valuation, which will affirm your value numbers"
-- "if you're not interested in selling at this point, the valuation will also give you key growth information"
+${sellingCaveat ? `- SKIP "if you're not interested in selling at this point" — this lead has already expressed interest in a valuation/transition. Instead, briefly mention that the valuation also provides growth intelligence useful for their acquisition/expansion goals (you may paraphrase naturally — do NOT include the verbatim phrase).` : `- "if you're not interested in selling at this point, the valuation will also give you key growth information"`}
 - "Happy to hop on a 10-minute call to share additional information and answer questions if it makes sense for you."
 ${value && value !== 'unknown' && value !== '-' ? `- "your business could be worth between ${value}" (use this exact range verbatim)` : ''}
 
