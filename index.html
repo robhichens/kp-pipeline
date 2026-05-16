@@ -51,7 +51,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 72px;
+    height: 84px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -75,21 +75,23 @@
   .header-divider { width: 1px; height: 36px; background: #333; }
   .tab-nav { display: flex; gap: 6px; }
   .tab-btn {
-    background: none;
-    border: none;
-    color: #aaa;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #ccc;
     font-family: var(--font);
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px 22px;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.15s;
     min-height: 44px;
+    letter-spacing: 0.01em;
   }
-  .tab-btn:hover { color: white; background: #2a2a3e; }
+  .tab-btn:hover { color: white; background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.3); }
   .tab-btn:focus-visible { outline: 3px solid var(--gold-light); outline-offset: 2px; }
-  .tab-btn.active { color: var(--gold-light); background: #1e1e2e; }
+  .tab-btn.active { color: white; background: var(--gold); border-color: var(--gold); }
+  .tab-btn-email.active { background: var(--paper); color: var(--ink); border-color: var(--paper); }
 
   /* STATS BAR */
   .stats-bar {
@@ -1435,8 +1437,8 @@
   </div>
   <div class="header-divider"></div>
   <nav class="tab-nav">
-    <button class="tab-btn active" onclick="switchTab('pipeline')">📋 Pipeline</button>
-    <button class="tab-btn" onclick="switchTab('email')">✉️ Email Generator</button>
+    <button class="tab-btn active" onclick="switchTab('pipeline')">$ Pipeline</button>
+    <button class="tab-btn tab-btn-email" onclick="switchTab('email')">@ Email Generator</button>
   </nav>
 </header>
 <!-- STATS BAR -->
