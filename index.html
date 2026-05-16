@@ -1238,6 +1238,124 @@
     #printRoot .prep-section-title { font-size: 9pt; }
   }
 
+  /* ADD LEAD / IMPORT BUTTONS */
+  .bar-action-btn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    min-height: 44px;
+    white-space: nowrap;
+  }
+  .bar-action-btn:hover { background: var(--gold); }
+  .bar-action-btn.import { background: var(--blue); }
+  .bar-action-btn.import:hover { background: #0a1f36; }
+
+  /* ADD LEAD MODAL */
+  .slim-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 300;
+    backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+  }
+  .slim-modal-overlay.open { display: flex; }
+  .slim-modal {
+    background: white;
+    border-radius: 18px;
+    width: 560px;
+    max-width: 96vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .slim-modal-header {
+    padding: 24px 28px 16px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .slim-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .slim-modal-body { padding: 24px 28px; }
+
+  /* IMPORT MODAL */
+  .import-modal {
+    width: 680px;
+  }
+  .csv-drop-area {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .csv-drop-area:hover { border-color: var(--gold); background: #faf7f3; }
+  .csv-drop-area.has-file { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .mapping-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  .mapping-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .mapping-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #ede8e0;
+    vertical-align: middle;
+  }
+  .mapping-table tr:last-child td { border-bottom: none; }
+  .mapping-select {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-family: var(--font);
+    font-size: 14px;
+    outline: none;
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+    min-height: 38px;
+  }
+  .mapping-select:focus { border-color: var(--gold); }
+  .field-required { color: var(--gold); font-weight: 800; margin-left: 2px; }
+  .import-preview-note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    font-style: italic;
+  }
+  .import-step { display: none; }
+  .import-step.active { display: block; }
+
   /* EMAIL LOG */
   .email-log-empty {
     padding: 48px 24px;
@@ -1349,6 +1467,8 @@
       <button class="view-toggle-btn active" id="btnTable" onclick="setView('table')" title="Table view">☰</button>
       <button class="view-toggle-btn" id="btnKanban" onclick="setView('kanban')" title="Kanban view">⊞</button>
     </div>
+    <button class="bar-action-btn" onclick="openAddLeadModal()">+ Add Lead</button>
+    <button class="bar-action-btn import" onclick="openImportModal()">⬆ Import CSV</button>
   </div>
 </div>
 
@@ -1368,7 +1488,6 @@
             <th>RE</th>
             <th onclick="sortBy('stage')">Stage ↕</th>
             <th>Next Steps</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="leadsTableBody"></tbody>
@@ -1647,6 +1766,133 @@
   </div>
 </div>
 
+<!-- ADD LEAD MODAL -->
+<div class="slim-modal-overlay" id="addLeadOverlay" onclick="closeAddLeadOnBg(event)">
+  <div class="slim-modal">
+    <div class="slim-modal-header">
+      <div class="slim-modal-title">+ Add New Lead</div>
+      <button class="modal-close" onclick="closeAddLeadModal()">✕</button>
+    </div>
+    <div class="slim-modal-body">
+      <div class="edit-grid">
+        <div class="edit-field-group">
+          <label>First Name <span class="field-required">*</span></label>
+          <input class="edit-input" id="al-firstName" type="text" placeholder="First name">
+        </div>
+        <div class="edit-field-group">
+          <label>Last Name <span class="field-required">*</span></label>
+          <input class="edit-input" id="al-lastName" type="text" placeholder="Last name">
+        </div>
+        <div class="edit-field-group" style="grid-column:span 2">
+          <label>Company Name <span class="field-required">*</span></label>
+          <input class="edit-input" id="al-company" type="text" placeholder="School or company name">
+        </div>
+        <div class="edit-field-group">
+          <label>Email</label>
+          <input class="edit-input" id="al-email" type="text" placeholder="email@example.com">
+        </div>
+        <div class="edit-field-group">
+          <label>Phone</label>
+          <input class="edit-input" id="al-phone" type="text" placeholder="(555) 000-0000">
+        </div>
+        <div class="edit-field-group">
+          <label>City</label>
+          <input class="edit-input" id="al-city" type="text" placeholder="City or metro area">
+        </div>
+        <div class="edit-field-group">
+          <label>State</label>
+          <input class="edit-input" id="al-state" type="text" placeholder="e.g. NC or NC, GA">
+        </div>
+        <div class="edit-field-group">
+          <label># of Locations</label>
+          <input class="edit-input" id="al-locs" type="text" placeholder="e.g. 4">
+        </div>
+        <div class="edit-field-group">
+          <label>Est. Business Value</label>
+          <input class="edit-input" id="al-value" type="text" placeholder="e.g. $10MM - $12MM">
+        </div>
+        <div class="edit-field-group" style="grid-column:span 2">
+          <label>Real Estate</label>
+          <select class="edit-input" id="al-re">
+            <option value="">Unknown</option>
+            <option value="Owns RE">Owns RE</option>
+            <option value="Does not own RE">Does not own RE</option>
+          </select>
+        </div>
+        <div class="edit-field-group" style="grid-column:span 2">
+          <label>Website</label>
+          <input class="edit-input" id="al-website" type="text" placeholder="https://...">
+        </div>
+        <div class="edit-field-group" style="grid-column:span 2">
+          <label>Pipeline Stage</label>
+          <select class="edit-input" id="al-stage">
+            <option value="new">New</option>
+            <option value="no-answer">No Answer</option>
+            <option value="voicemail">Voicemail Left</option>
+            <option value="connected">Connected</option>
+            <option value="followup">Follow-up Scheduled</option>
+            <option value="valuation">Valuation Offered</option>
+            <option value="nurturing">Nurturing</option>
+            <option value="dead">Not Viable</option>
+          </select>
+        </div>
+        <div class="edit-field-group" style="grid-column:span 2">
+          <label>Initial Notes</label>
+          <textarea class="edit-textarea" id="al-notes" placeholder="Any initial research or outreach notes..."></textarea>
+        </div>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-save" onclick="saveNewLead()">Save Lead</button>
+        <button class="btn-cancel" onclick="closeAddLeadModal()">Cancel</button>
+        <span class="saved-msg" id="alSavedMsg" style="display:none">✓ Lead added!</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT CSV MODAL -->
+<div class="slim-modal-overlay" id="importOverlay" onclick="closeImportOnBg(event)">
+  <div class="slim-modal import-modal">
+    <div class="slim-modal-header">
+      <div class="slim-modal-title">⬆ Import Leads from CSV</div>
+      <button class="modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="slim-modal-body">
+
+      <!-- Step 1: file pick -->
+      <div class="import-step active" id="importStep1">
+        <div class="csv-drop-area" id="csvDropArea" onclick="document.getElementById('csvFileInput').click()">
+          <div style="font-size:32px;margin-bottom:10px">📂</div>
+          <strong>Click to choose a CSV file</strong><br>
+          Any CSV with column headers — you'll map the columns next.
+        </div>
+        <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none" onchange="handleCsvFile(event)">
+      </div>
+
+      <!-- Step 2: column mapping -->
+      <div class="import-step" id="importStep2">
+        <p class="import-preview-note" id="importPreviewNote"></p>
+        <div style="max-height:380px;overflow-y:auto;border:1px solid var(--border);border-radius:10px">
+          <table class="mapping-table">
+            <thead>
+              <tr>
+                <th>Our Field</th>
+                <th>Your CSV Column</th>
+              </tr>
+            </thead>
+            <tbody id="mappingTableBody"></tbody>
+          </table>
+        </div>
+        <div class="edit-actions" style="margin-top:18px">
+          <button class="btn-save" id="executeImportBtn" onclick="executeImport()">Import Leads</button>
+          <button class="btn-cancel" onclick="resetImport()">← Choose different file</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1819,11 +2065,6 @@ function renderTable() {
       <td>${hasRE ? '<span class="re-owned">✓ RE</span>' : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
       <td><span class="badge ${cls}"><span class="badge-dot"></span>${stageLabel}</span></td>
       <td>${hasNextStep ? `<span class="next-step-tag" title="${l.nextSteps}">${l.nextSteps}</span>` : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
-      <td onclick="event.stopPropagation()">
-        <button class="action-btn" onclick="openModal(${l.id})">View</button>
-        <button class="action-btn" style="background:var(--amber);margin-left:4px" onclick="openModalTab(${l.id},'edit')">Edit</button>
-        <button class="action-btn email-btn" onclick="openEmailForLeadId(${l.id})">Email</button>
-      </td>
     </tr>`;
   }).join('');
 }
@@ -1855,11 +2096,6 @@ function renderMobileCards(filtered) {
         ${hasValue ? `<span class="value-pill">${l.value}</span>` : ''}
         ${hasRE ? `<span class="re-owned">✓ RE</span>` : ''}
         <span style="font-size:13px;color:var(--muted)">${l.city ? l.city + ', ' : ''}${l.state}</span>
-      </div>
-      <div class="m-card-actions" onclick="event.stopPropagation()">
-        <button class="m-card-btn m-card-btn-view" onclick="openModal(${l.id})">View</button>
-        <button class="m-card-btn m-card-btn-edit" onclick="openModalTab(${l.id},'edit')">Edit</button>
-        <button class="m-card-btn m-card-btn-email" onclick="openEmailForLeadId(${l.id})">✉ Email</button>
       </div>
     </div>`;
   }).join('');
@@ -2748,6 +2984,273 @@ function printLead() {
   window.print();
   // Clean up after print dialog closes
   setTimeout(() => root.remove(), 1000);
+}
+
+// ==================== ADD LEAD ====================
+function openAddLeadModal() {
+  ['firstName','lastName','company','email','phone','city','state','locs','value','website','notes'].forEach(f => {
+    const el = document.getElementById('al-' + f);
+    if (el) el.value = '';
+  });
+  document.getElementById('al-re').value = '';
+  document.getElementById('al-stage').value = 'new';
+  document.getElementById('alSavedMsg').style.display = 'none';
+  document.getElementById('addLeadOverlay').classList.add('open');
+}
+
+function closeAddLeadModal() {
+  document.getElementById('addLeadOverlay').classList.remove('open');
+}
+
+function closeAddLeadOnBg(e) {
+  if (e.target === document.getElementById('addLeadOverlay')) closeAddLeadModal();
+}
+
+function saveNewLead() {
+  const firstName = document.getElementById('al-firstName').value.trim();
+  const lastName  = document.getElementById('al-lastName').value.trim();
+  const company   = document.getElementById('al-company').value.trim();
+  if (!firstName || !lastName || !company) {
+    alert('First name, last name, and company are required.');
+    return;
+  }
+  const newId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
+  const notes = document.getElementById('al-notes').value.trim();
+  leads.push({
+    id: newId,
+    firstName, lastName,
+    title: '',
+    company,
+    email: document.getElementById('al-email').value.trim(),
+    altEmail: '',
+    phone: document.getElementById('al-phone').value.trim(),
+    city: document.getElementById('al-city').value.trim(),
+    state: document.getElementById('al-state').value.trim(),
+    locs: document.getElementById('al-locs').value.trim(),
+    capacity: '',
+    re: document.getElementById('al-re').value,
+    website: document.getElementById('al-website').value.trim(),
+    value: document.getElementById('al-value').value.trim() || '-',
+    researchNotes: notes,
+    otherNotes: '',
+    outreachNotes: '',
+    followUpNotes: '',
+    nextSteps: '',
+    listDate: new Date().toLocaleDateString('en-US'),
+    addedNotes: [],
+    stage: document.getElementById('al-stage').value,
+  });
+  saveLeads();
+  updateStats();
+  if (currentView === 'kanban') renderKanban(); else renderTable();
+  populateEmailLeadSelect();
+  setTimeout(closeAddLeadModal, 800);
+  document.getElementById('alSavedMsg').style.display = 'inline';
+  showToast(`${firstName} ${lastName} added!`);
+}
+
+// ==================== CSV IMPORT ====================
+let csvHeaders = [];
+let csvRows = [];
+
+const IMPORT_FIELDS = [
+  { key: 'firstName',    label: 'First Name',       required: true },
+  { key: 'lastName',     label: 'Last Name',        required: true },
+  { key: 'company',      label: 'Company Name',     required: true },
+  { key: 'email',        label: 'Email' },
+  { key: 'altEmail',     label: 'Alt Email' },
+  { key: 'phone',        label: 'Phone' },
+  { key: 'city',         label: 'City' },
+  { key: 'state',        label: 'State' },
+  { key: 'locs',         label: '# of Locations' },
+  { key: 'capacity',     label: 'Licensed Capacity' },
+  { key: 're',           label: 'Real Estate (RE)' },
+  { key: 'website',      label: 'Website' },
+  { key: 'value',        label: 'Business Value' },
+  { key: 'researchNotes',  label: 'Research Notes' },
+  { key: 'outreachNotes',  label: 'Outreach Notes' },
+  { key: 'followUpNotes',  label: 'Follow-Up Notes' },
+  { key: 'otherNotes',     label: 'Other Notes' },
+  { key: 'nextSteps',      label: 'Next Steps' },
+  { key: 'listDate',       label: 'Lead List Date' },
+];
+
+function autoMatchHeader(csvHeader) {
+  const h = csvHeader.toLowerCase();
+  if (h.includes('first'))                             return 'firstName';
+  if (h.includes('last'))                              return 'lastName';
+  if (h.includes('company') || h.includes('school'))  return 'company';
+  if ((h.includes('alt') || h.includes('alternate')) && h.includes('email')) return 'altEmail';
+  if (h.includes('email'))                             return 'email';
+  if (h.includes('phone') || h.includes('mobile'))    return 'phone';
+  if (h.includes('city'))                              return 'city';
+  if (h === 'state' || h.includes('state'))            return 'state';
+  if ((h.includes('#') || h.includes('num') || h.includes('of')) && h.includes('loc')) return 'locs';
+  if (h.includes('capacit') || h === 'lc')             return 'capacity';
+  if (h === 're' || h === 'real estate' || (h.includes('real') && h.includes('estate'))) return 're';
+  if (h.includes('website') || h.includes('url'))      return 'website';
+  if (h.includes('value') || h.includes('valuation'))  return 'value';
+  if (h.includes('follow') && h.includes('up'))        return 'followUpNotes';
+  if (h.includes('outreach'))                          return 'outreachNotes';
+  if (h.includes('research') || h.includes('kim'))     return 'researchNotes';
+  if (h.includes('other') || h.includes('note'))       return 'otherNotes';
+  if (h.includes('next'))                              return 'nextSteps';
+  if (h.includes('date') || h.includes('list'))        return 'listDate';
+  return '';
+}
+
+function parseCsv(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"' && text[i + 1] === '"') { field += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { field += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { row.push(field.trim()); field = ''; }
+      else if (ch === '\n') { row.push(field.trim()); if (row.some(c => c)) rows.push(row); row = []; field = ''; }
+      else if (ch !== '\r') { field += ch; }
+    }
+  }
+  if (field || row.length) { row.push(field.trim()); if (row.some(c => c)) rows.push(row); }
+  return rows;
+}
+
+function openImportModal() {
+  resetImport();
+  document.getElementById('importOverlay').classList.add('open');
+}
+
+function closeImportModal() {
+  document.getElementById('importOverlay').classList.remove('open');
+}
+
+function closeImportOnBg(e) {
+  if (e.target === document.getElementById('importOverlay')) closeImportModal();
+}
+
+function resetImport() {
+  csvHeaders = []; csvRows = [];
+  document.getElementById('csvFileInput').value = '';
+  document.getElementById('csvDropArea').classList.remove('has-file');
+  document.getElementById('csvDropArea').innerHTML = '<div style="font-size:32px;margin-bottom:10px">📂</div><strong>Click to choose a CSV file</strong><br>Any CSV with column headers — you\'ll map the columns next.';
+  document.getElementById('importStep1').classList.add('active');
+  document.getElementById('importStep2').classList.remove('active');
+}
+
+function handleCsvFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const parsed = parseCsv(e.target.result);
+    if (parsed.length < 2) { alert('CSV appears empty or has no data rows.'); return; }
+    csvHeaders = parsed[0];
+    csvRows = parsed.slice(1);
+    document.getElementById('csvDropArea').classList.add('has-file');
+    document.getElementById('csvDropArea').innerHTML = `<div style="font-size:28px;margin-bottom:6px">✅</div><strong>${file.name}</strong><br>${csvRows.length} data rows, ${csvHeaders.length} columns detected.`;
+    renderColumnMapping();
+    document.getElementById('importStep1').classList.remove('active');
+    document.getElementById('importStep2').classList.add('active');
+    document.getElementById('importPreviewNote').textContent =
+      `${csvRows.length} leads found. Map your CSV columns to our fields below. Required fields are marked *.`;
+    document.getElementById('executeImportBtn').textContent = `Import ${csvRows.length} Leads`;
+  };
+  reader.readAsText(file);
+}
+
+function renderColumnMapping() {
+  const usedKeys = new Set();
+  const options = ['<option value="">— Skip —</option>',
+    ...csvHeaders.map((h, i) => `<option value="${i}">${h}</option>`)
+  ].join('');
+
+  document.getElementById('mappingTableBody').innerHTML = IMPORT_FIELDS.map(f => {
+    const autoIdx = csvHeaders.findIndex(h => autoMatchHeader(h) === f.key);
+    const sel = `<select class="mapping-select" id="map-${f.key}">${options}</select>`;
+    const row = `<tr>
+      <td style="font-weight:600;font-size:13px">${f.label}${f.required ? '<span class="field-required"> *</span>' : ''}</td>
+      <td>${sel}</td>
+    </tr>`;
+    if (autoIdx !== -1 && !usedKeys.has(f.key)) usedKeys.add(f.key);
+    return row;
+  }).join('');
+
+  // Set auto-matched values after rendering
+  IMPORT_FIELDS.forEach(f => {
+    const autoIdx = csvHeaders.findIndex(h => autoMatchHeader(h) === f.key);
+    if (autoIdx !== -1) {
+      const el = document.getElementById('map-' + f.key);
+      if (el) el.value = String(autoIdx);
+    }
+  });
+}
+
+function executeImport() {
+  const mapping = {};
+  for (const f of IMPORT_FIELDS) {
+    const el = document.getElementById('map-' + f.key);
+    if (el && el.value !== '') mapping[f.key] = parseInt(el.value);
+  }
+  if (!('firstName' in mapping) || !('lastName' in mapping) || !('company' in mapping)) {
+    alert('Please map at least First Name, Last Name, and Company Name before importing.');
+    return;
+  }
+
+  const existingEmails = new Set(leads.map(l => l.email?.toLowerCase()).filter(Boolean));
+  let nextId = leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 0;
+  let imported = 0, skipped = 0;
+
+  for (const row of csvRows) {
+    const get = key => (mapping[key] !== undefined ? (row[mapping[key]] || '').trim() : '');
+    const email = get('email').toLowerCase();
+    if (email && existingEmails.has(email)) { skipped++; continue; }
+
+    const firstName = get('firstName');
+    const lastName  = get('lastName');
+    const company   = get('company');
+    if (!firstName && !lastName && !company) continue;
+
+    leads.push({
+      id: nextId++,
+      firstName, lastName,
+      title: '',
+      company,
+      email: get('email'),
+      altEmail: get('altEmail'),
+      phone: get('phone'),
+      city: get('city'),
+      state: get('state'),
+      locs: get('locs'),
+      capacity: get('capacity'),
+      re: get('re'),
+      website: get('website'),
+      value: get('value') || '-',
+      researchNotes: get('researchNotes'),
+      otherNotes: get('otherNotes'),
+      outreachNotes: get('outreachNotes'),
+      followUpNotes: get('followUpNotes'),
+      nextSteps: get('nextSteps'),
+      listDate: get('listDate'),
+      addedNotes: [],
+      stage: 'new',
+    });
+    if (email) existingEmails.add(email);
+    imported++;
+  }
+
+  saveLeads();
+  updateStats();
+  if (currentView === 'kanban') renderKanban(); else renderTable();
+  populateEmailLeadSelect();
+  closeImportModal();
+  const msg = skipped > 0
+    ? `${imported} leads imported, ${skipped} skipped (duplicate email)`
+    : `${imported} leads imported!`;
+  showToast(msg);
 }
 
 // ==================== INIT ====================
