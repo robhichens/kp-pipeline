@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>HINGE Advisors — Lead Pipeline</title>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -245,6 +246,8 @@
   .stage-followup .badge-dot { background: #3a1260; }
   .stage-valuation { background: #faecc8; color: #6b4800; border-color: #d4b060; }
   .stage-valuation .badge-dot { background: #6b4800; }
+  .stage-val-triggered { background: #f0d8ff; color: #5c0099; border-color: #c070e8; }
+  .stage-val-triggered .badge-dot { background: #8b00ff; }
   .stage-nurturing { background: #f5d8d8; color: #6e1212; border-color: #d09090; }
   .stage-nurturing .badge-dot { background: #6e1212; }
   .stage-dead { background: #e8e8e8; color: #444; border-color: #ccc; }
@@ -873,6 +876,7 @@
   .kh-connected { background: #c8e8d8; color: #0f3d24; border: 1px solid #80c8a0; }
   .kh-followup { background: #e0d0f5; color: #2e0a50; border: 1px solid #b098e0; }
   .kh-valuation { background: #faecc8; color: #5a3800; border: 1px solid #d4b060; }
+  .kh-val-triggered { background: linear-gradient(135deg, #8b00ff, #cc44ff); color: white; border: none; }
   .kh-nurturing { background: #f5d8d8; color: #4e0808; border: 1px solid #d09090; }
   .kh-dead { background: #e8e8e8; color: #2e2e2e; border: 1px solid #c0c0c0; }
 
@@ -1466,6 +1470,7 @@
       <option value="connected">Connected</option>
       <option value="followup">Follow-up Scheduled</option>
       <option value="valuation">Valuation Offered</option>
+      <option value="val-triggered">Valuation Triggered</option>
       <option value="nurturing">Nurturing</option>
       <option value="dead">Not Viable</option>
     </select>
@@ -1899,6 +1904,12 @@
   </div>
 </div>
 
+<!-- VALUATION TRIGGERED MEME OVERLAY -->
+<div id="memeOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);letter-spacing:0.04em">🎉 Valuation Triggered! 🎉</div>
+  <video id="memeVideo" src="assests/grok-video-2d8cfa9f-2fc9-4622-afd6-4ff8eacb9062.mp4" autoplay playsinline style="max-width:70vw;max-height:65vh;border-radius:16px;box-shadow:0 0 60px rgba(139,0,255,0.7),0 0 120px rgba(255,215,0,0.4)"></video>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1924,6 +1935,7 @@ const STAGES = [
   { id: 'connected', label: 'Connected', cls: 'stage-connected' },
   { id: 'followup', label: 'Follow-up Scheduled', cls: 'stage-followup' },
   { id: 'valuation', label: 'Valuation Offered', cls: 'stage-valuation' },
+  { id: 'val-triggered', label: 'Valuation Triggered', cls: 'stage-val-triggered' },
   { id: 'nurturing', label: 'Nurturing', cls: 'stage-nurturing' },
   { id: 'dead', label: 'Not Viable', cls: 'stage-dead' },
 ];
@@ -2208,10 +2220,12 @@ function closeModalOnBg(e) {
 function updateStage() {
   if (currentLeadIdx === null) return;
   const l = leads.find(x => x.id === currentLeadIdx);
-  l.stage = document.getElementById('modalStageSelect').value;
+  const newStage = document.getElementById('modalStageSelect').value;
+  l.stage = newStage;
   saveLeads();
   document.getElementById('stageSavedMsg').style.display = 'inline';
   setTimeout(() => document.getElementById('stageSavedMsg').style.display = 'none', 2000);
+  if (newStage === 'val-triggered') triggerValuationCelebration();
 }
 
 function saveNote() {
@@ -2767,7 +2781,7 @@ function renderKanban() {
   const headerClsMap = {
     'new': 'kh-new', 'no-answer': 'kh-no-answer', 'voicemail': 'kh-voicemail',
     'connected': 'kh-connected', 'followup': 'kh-followup', 'valuation': 'kh-valuation',
-    'nurturing': 'kh-nurturing', 'dead': 'kh-dead'
+    'val-triggered': 'kh-val-triggered', 'nurturing': 'kh-nurturing', 'dead': 'kh-dead'
   };
 
   board.innerHTML = stagesToShow.map(stage => {
@@ -2886,6 +2900,7 @@ function onDrop(e) {
   saveLeads();
   updateStats();
   showToast(`${lead.firstName} moved to ${STAGES.find(s => s.id === newStage)?.label}`);
+  if (newStage === 'val-triggered') triggerValuationCelebration();
 
   // Smooth DOM update — move card without full re-render
   const card = document.querySelector(`.kanban-card[data-id="${draggedId}"]`);
@@ -2990,6 +3005,38 @@ function printLead() {
   window.print();
   // Clean up after print dialog closes
   setTimeout(() => root.remove(), 1000);
+}
+
+// ==================== VALUATION CELEBRATION ====================
+function triggerValuationCelebration() {
+  const colors = ['#ffd700','#ff69b4','#8b00ff','#00ff88','#ff4500','#b8860b','#cc44ff'];
+
+  // Big central burst
+  confetti({ particleCount: 180, spread: 120, origin: { y: 0.5 }, colors, startVelocity: 50 });
+
+  // Side cannons after a beat
+  setTimeout(() => {
+    confetti({ particleCount: 100, angle: 60, spread: 80, origin: { x: 0, y: 0.65 }, colors });
+    confetti({ particleCount: 100, angle: 120, spread: 80, origin: { x: 1, y: 0.65 }, colors });
+  }, 350);
+
+  // Glitter shower
+  setTimeout(() => {
+    confetti({ particleCount: 60, spread: 60, origin: { y: 0.3 }, colors, gravity: 0.5, scalar: 0.7 });
+  }, 800);
+
+  // Show meme
+  const overlay = document.getElementById('memeOverlay');
+  const video = document.getElementById('memeVideo');
+  overlay.style.display = 'flex';
+  video.currentTime = 0;
+  video.play().catch(() => {});
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    video.pause();
+    video.currentTime = 0;
+  }, 4000);
 }
 
 // ==================== ADD LEAD ====================
