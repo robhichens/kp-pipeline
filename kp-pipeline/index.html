@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HINGE Advisors — Lead Pipeline</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --ink: #0f1117;
+    --paper: #f5f2ed;
+    --cream: #ede9e1;
+    --gold: #b8860b;
+    --gold-light: #d4a92a;
+    --gold-pale: #f5e9c8;
+    --green: #2d6a4f;
+    --green-light: #e8f5ee;
+    --blue: #1a3a5c;
+    --blue-light: #e8eef5;
+    --red: #8b1a1a;
+    --red-light: #f5e8e8;
+    --amber: #7a4a00;
+    --amber-light: #fdf3e0;
+    --purple: #4a1d7a;
+    --purple-light: #f0eafc;
+    --muted: #7a7060;
+    --border: #d8d0c0;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: white;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 2px solid var(--gold);
+  }
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .header-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold-light);
+    letter-spacing: 0.02em;
+  }
+  .header-subtitle {
+    font-size: 12px;
+    color: #888;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-divider {
+    width: 1px;
+    height: 32px;
+    background: #333;
+  }
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .tab-btn:hover { color: white; background: #222; }
+  .tab-btn.active { color: var(--gold-light); background: #1e1e1e; }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--cream);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    gap: 32px;
+    align-items: center;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+  }
+  .stat-divider { width: 1px; height: 36px; background: var(--border); }
+  .stats-search {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .search-input {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    width: 240px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--gold); }
+  .filter-select {
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    color: var(--ink);
+  }
+
+  /* TABS */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* PIPELINE TABLE */
+  .pipeline-container { padding: 24px 32px; }
+  .table-wrap {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead { background: var(--ink); }
+  thead th {
+    color: #bbb;
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 12px 16px;
+    text-align: left;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+  thead th:hover { color: var(--gold-light); }
+  tbody tr {
+    border-bottom: 1px solid #f0ece6;
+    transition: background 0.1s;
+    cursor: pointer;
+  }
+  tbody tr:hover { background: #faf8f5; }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 12px 16px; vertical-align: middle; }
+  .lead-name { font-weight: 600; color: var(--ink); }
+  .lead-company { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .lead-location { font-size: 12px; color: var(--muted); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  .stage-new { background: var(--blue-light); color: var(--blue); }
+  .stage-new .badge-dot { background: var(--blue); }
+  .stage-voicemail { background: var(--amber-light); color: var(--amber); }
+  .stage-voicemail .badge-dot { background: var(--amber); }
+  .stage-no-answer { background: var(--cream); color: var(--muted); border: 1px solid var(--border); }
+  .stage-no-answer .badge-dot { background: var(--muted); }
+  .stage-connected { background: var(--green-light); color: var(--green); }
+  .stage-connected .badge-dot { background: var(--green); }
+  .stage-followup { background: var(--purple-light); color: var(--purple); }
+  .stage-followup .badge-dot { background: var(--purple); }
+  .stage-valuation { background: var(--gold-pale); color: var(--gold); }
+  .stage-valuation .badge-dot { background: var(--gold); }
+  .stage-nurturing { background: var(--red-light); color: var(--red); }
+  .stage-nurturing .badge-dot { background: var(--red); }
+  .stage-dead { background: #f0f0f0; color: #999; }
+  .stage-dead .badge-dot { background: #ccc; }
+
+  .value-pill {
+    background: var(--gold-pale);
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  .loc-count {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  .re-owned { color: var(--green); font-size: 12px; font-weight: 600; }
+  .action-btn {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .action-btn:hover { background: var(--gold); }
+  .action-btn.email-btn {
+    background: var(--green);
+    margin-left: 4px;
+  }
+  .action-btn.email-btn:hover { background: #1e4f38; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 200;
+    backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 16px;
+    width: 720px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .modal-header {
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1;
+  }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+  .modal-company { font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--muted);
+    line-height: 1;
+    padding: 2px 6px;
+  }
+  .modal-close:hover { color: var(--ink); }
+  .modal-body { padding: 24px 28px; }
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .modal-field label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .modal-field .field-val {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .modal-field .field-val a { color: var(--blue); text-decoration: none; }
+  .modal-field .field-val a:hover { text-decoration: underline; }
+  .modal-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 20px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .note-block {
+    background: var(--cream);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink);
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+  }
+  .stage-select-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .stage-select-wrap label { font-size: 13px; font-weight: 500; }
+  .stage-select {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    background: white;
+  }
+  .notes-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .notes-input:focus { border-color: var(--gold); }
+  .btn-primary {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 10px;
+  }
+  .btn-primary:hover { background: var(--gold); }
+  .btn-secondary {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 10px;
+    margin-left: 8px;
+  }
+  .btn-secondary:hover { background: #1e4f38; }
+  .saved-msg {
+    display: none;
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* EMAIL GENERATOR TAB */
+  .email-container {
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .email-form-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 88px;
+  }
+  .email-form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .form-group select,
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    background: white;
+    color: var(--ink);
+  }
+  .form-group select:focus,
+  .form-group input:focus,
+  .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .generate-btn {
+    width: 100%;
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .generate-btn:hover { background: var(--gold); }
+  .generate-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  .email-output-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    min-height: 400px;
+  }
+  .email-output-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .email-output-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .copy-btn {
+    background: var(--green);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: none;
+  }
+  .copy-btn:hover { background: #1e4f38; }
+  .copy-btn.visible { display: inline-block; }
+  .email-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    color: var(--muted);
+    text-align: center;
+    gap: 12px;
+  }
+  .email-placeholder svg { opacity: 0.3; }
+  .email-placeholder p { font-size: 14px; }
+  .email-content {
+    display: none;
+    white-space: pre-wrap;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--ink);
+    background: #faf8f5;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .email-content.visible { display: block; }
+  .loading-indicator {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 30px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .loading-indicator.visible { display: flex; }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* next steps badge */
+  .next-step-tag {
+    display: inline-block;
+    background: var(--purple-light);
+    color: var(--purple);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--ink);
+    color: white;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 999;
+    display: none;
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show { display: block; animation: fadeInUp 0.2s ease; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .row-count { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+  /* VIEW TOGGLE */
+  .view-toggle {
+    display: flex;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+    margin-left: 8px;
+  }
+  .view-toggle-btn {
+    background: none;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    transition: background 0.12s;
+    color: var(--muted);
+  }
+  .view-toggle-btn.active {
+    background: white;
+    color: var(--ink);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  }
+
+  /* KANBAN */
+  .kanban-container {
+    padding: 20px 24px 32px;
+    overflow-x: auto;
+  }
+  .kanban-board {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    min-width: max-content;
+  }
+  .kanban-col {
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .kanban-col-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    border-radius: 10px 10px 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    border-bottom: none;
+  }
+  .kanban-col-count {
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 0.7;
+    background: rgba(255,255,255,0.35);
+    border-radius: 10px;
+    padding: 1px 7px;
+  }
+  .kanban-col-body {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 80px;
+  }
+  .kanban-card {
+    background: white;
+    border-radius: 8px;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: box-shadow 0.15s, transform 0.1s;
+    position: relative;
+  }
+  .kanban-card:hover .kanban-hover-btns { opacity: 1 !important; }
+  .kanban-card:hover {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+  }
+  .kanban-card-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+  .kanban-card-company {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+  .kanban-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .kanban-card-loc {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .kanban-card-value {
+    background: var(--gold-pale);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .kanban-card-re {
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .kanban-card-email-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 3px 7px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .kanban-card:hover .kanban-card-email-btn { opacity: 1; }
+  .kanban-empty {
+    text-align: center;
+    color: #ccc;
+    font-size: 12px;
+    padding: 16px 8px;
+  }
+
+  /* column header color overrides */
+  .kh-new { background: var(--blue-light); color: var(--blue); border: 1px solid #c5d8ed; }
+  .kh-no-answer { background: var(--cream); color: var(--muted); border: 1px solid var(--border); }
+  .kh-voicemail { background: var(--amber-light); color: var(--amber); border: 1px solid #e8c98a; }
+  .kh-connected { background: var(--green-light); color: var(--green); border: 1px solid #b0d9c2; }
+  .kh-followup { background: var(--purple-light); color: var(--purple); border: 1px solid #c9b8e8; }
+  .kh-valuation { background: var(--gold-pale); color: var(--gold); border: 1px solid #e0c878; }
+  .kh-nurturing { background: var(--red-light); color: var(--red); border: 1px solid #d9b0b0; }
+  .kh-dead { background: #f0f0f0; color: #999; border: 1px solid #ddd; }
+
+  /* MODAL TABS */
+  .modal-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    background: #faf8f5;
+  }
+  .modal-tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 10px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .modal-tab-btn:hover { color: var(--ink); }
+  .modal-tab-btn.active { color: var(--ink); border-bottom-color: var(--gold); }
+  .modal-tab-panel { display: none; padding: 24px 28px; }
+  .modal-tab-panel.active { display: block; }
+
+  /* EDIT MODE */
+  .edit-field-group { margin-bottom: 14px; }
+  .edit-field-group label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .edit-input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: white;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .edit-input:focus { border-color: var(--gold); }
+  .edit-textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 8px 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--ink);
+    background: white;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.15s;
+  }
+  .edit-textarea:focus { border-color: var(--gold); }
+  .edit-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .edit-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-save { background: var(--green); color: white; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .btn-save:hover { background: #1e4f38; }
+  .btn-cancel { background: none; border: 1px solid var(--border); color: var(--muted); padding: 10px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; transition: all 0.15s; }
+  .btn-cancel:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* RESEARCH TAB */
+  .research-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .research-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
+  .research-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-research {
+    background: var(--ink);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-research:hover { background: var(--gold); }
+  .btn-research:disabled { background: #ccc; cursor: not-allowed; }
+  .btn-copy-research {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: none;
+  }
+  .btn-copy-research.visible { display: inline-flex; align-items: center; gap: 5px; }
+  .btn-copy-research:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* state tabs inside research */
+  .state-tabs { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+  .state-tab-btn {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.12s;
+  }
+  .state-tab-btn.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .state-tab-btn:hover:not(.active) { border-color: var(--ink); color: var(--ink); }
+
+  .research-placeholder {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .research-loading {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  .research-loading.visible { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+  .research-progress { font-size: 12px; color: var(--muted); }
+
+  .prep-sheet {
+    display: none;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .prep-sheet.visible { display: block; }
+  .prep-sheet-header {
+    background: var(--ink);
+    color: white;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .prep-sheet-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; }
+  .prep-sheet-meta { font-size: 11px; color: #aaa; }
+  .prep-sheet-body { padding: 18px; }
+  .prep-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 16px 0 8px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prep-section-title:first-child { margin-top: 0; }
+  .prep-bullets { list-style: none; padding: 0; margin: 0; }
+  .prep-bullets li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink);
+    border-bottom: 1px solid #f5f0ea;
+  }
+  .prep-bullets li:last-child { border-bottom: none; }
+  .prep-bullets li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 11px;
+    top: 8px;
+  }
+  .prep-opener {
+    background: var(--green-light);
+    border-left: 3px solid var(--green);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 13px;
+    line-height: 1.55;
+    font-style: italic;
+    color: var(--green);
+    margin-bottom: 6px;
+  }
+  .print-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.12s;
+  }
+  .print-btn:hover { border-color: var(--ink); color: var(--ink); }
+  @media print {
+    header, .stats-bar, .tab-nav, .modal-tabs, .research-actions, .edit-actions { display: none !important; }
+    .modal { box-shadow: none; border: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div>
+      <div class="header-logo">HINGE Advisors</div>
+      <div class="header-subtitle">Lead Pipeline — Kathe Petchel</div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('pipeline')">📋 Pipeline</button>
+    <button class="tab-btn" onclick="switchTab('email')">✉️ Email Generator</button>
+  </nav>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total Leads</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat"><div class="stat-num" id="statActive">—</div><div class="stat-label">Active</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat"><div class="stat-num" id="statConnected">—</div><div class="stat-label">Connected</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat"><div class="stat-num" id="statValuation">—</div><div class="stat-label">Valuation Offered</div></div>
+  <div class="stat-divider"></div>
+  <div class="stat"><div class="stat-num" id="statNeedAction">—</div><div class="stat-label">Need Action</div></div>
+  <div class="stats-search">
+    <input type="text" class="search-input" placeholder="Search leads..." oninput="filterLeads()" id="searchBox">
+    <select class="filter-select" onchange="filterLeads()" id="stageFilter">
+      <option value="">All Stages</option>
+      <option value="new">New</option>
+      <option value="no-answer">No Answer</option>
+      <option value="voicemail">Voicemail Left</option>
+      <option value="connected">Connected</option>
+      <option value="followup">Follow-up Scheduled</option>
+      <option value="valuation">Valuation Offered</option>
+      <option value="nurturing">Nurturing</option>
+      <option value="dead">Not Viable</option>
+    </select>
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" id="btnTable" onclick="setView('table')" title="Table view">☰</button>
+      <button class="view-toggle-btn" id="btnKanban" onclick="setView('kanban')" title="Kanban view">⊞</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIPELINE TAB -->
+<div class="tab-panel active" id="tab-pipeline">
+  <div class="pipeline-container" id="tableView">
+    <div class="row-count" id="rowCount"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortBy('name')">Owner ↕</th>
+            <th onclick="sortBy('company')">Company ↕</th>
+            <th onclick="sortBy('location')">Location ↕</th>
+            <th onclick="sortBy('locs')">Locs ↕</th>
+            <th onclick="sortBy('value')">Est. Value ↕</th>
+            <th>RE</th>
+            <th onclick="sortBy('stage')">Stage ↕</th>
+            <th>Next Steps</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leadsTableBody"></tbody>
+      </table>
+      <div class="empty-state" id="emptyState" style="display:none">No leads match your search.</div>
+    </div>
+  </div>
+  <div class="kanban-container" id="kanbanView" style="display:none">
+    <div class="kanban-board" id="kanbanBoard"></div>
+  </div>
+</div>
+
+<!-- EMAIL GENERATOR TAB -->
+<div class="tab-panel" id="tab-email">
+  <div class="email-container">
+    <div class="email-form-card">
+      <div class="email-form-title">✉️ Email Generator</div>
+
+      <div class="form-group">
+        <label>Select Lead</label>
+        <select id="emailLeadSelect" onchange="populateLeadFields()">
+          <option value="">— Choose a lead —</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Lead's First Name</label>
+        <input type="text" id="emailFirstName" placeholder="e.g. Sandra">
+      </div>
+
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" id="emailCompany" placeholder="e.g. Rising Stars of NC">
+      </div>
+
+      <div class="form-group">
+        <label># of Locations</label>
+        <input type="text" id="emailLocs" placeholder="e.g. 6">
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Business Value</label>
+        <input type="text" id="emailValue" placeholder="e.g. $10MM - $12MM or unknown">
+      </div>
+
+      <div class="form-group">
+        <label>Owns Real Estate?</label>
+        <select id="emailRE">
+          <option value="unknown">Unknown</option>
+          <option value="yes">Yes — owns real estate</option>
+          <option value="no">No / Unable to verify</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Call Outcome</label>
+        <select id="emailOutcome">
+          <option value="voicemail">Left a voicemail</option>
+          <option value="no-number">Couldn't reach / no good number</option>
+          <option value="declined">Call was screened / declined</option>
+          <option value="connected">Had a conversation</option>
+          <option value="email-only">Email only (no call attempt)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Call & Research Notes</label>
+        <textarea id="emailNotes" placeholder="Paste your notes here — what you learned, what was discussed, any personal context, objections, tone of the call, etc."></textarea>
+      </div>
+
+      <button class="generate-btn" onclick="generateEmail()" id="generateBtn">Generate Email →</button>
+    </div>
+
+    <div class="email-output-card">
+      <div class="email-output-header">
+        <div class="email-output-title">Generated Email</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyEmail()">Copy to Clipboard</button>
+      </div>
+
+      <div class="email-placeholder" id="emailPlaceholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>
+        </svg>
+        <p>Fill in the form and click <strong>Generate Email</strong><br>to draft your personalized follow-up.</p>
+      </div>
+      <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner"></div>
+        <span>Claude is drafting your email...</span>
+      </div>
+      <div class="email-content" id="emailContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modalBox">
+
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalName"></div>
+        <div class="modal-company" id="modalCompany"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="print-btn" onclick="window.print()">🖨 Print</button>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+    </div>
+
+    <!-- Modal Sub-tabs -->
+    <div class="modal-tabs">
+      <button class="modal-tab-btn active" onclick="switchModalTab('overview')">📋 Overview</button>
+      <button class="modal-tab-btn" onclick="switchModalTab('edit')">✏️ Edit</button>
+      <button class="modal-tab-btn" onclick="switchModalTab('research')">🔍 Research & Call Prep</button>
+    </div>
+
+    <!-- TAB: OVERVIEW -->
+    <div class="modal-tab-panel active" id="mtab-overview">
+      <div class="stage-select-wrap">
+        <label>Pipeline Stage:</label>
+        <select class="stage-select" id="modalStageSelect" onchange="updateStage()"></select>
+        <span id="stageSavedMsg" class="saved-msg">✓ Saved</span>
+      </div>
+      <div class="modal-grid" id="modalGrid"></div>
+      <div class="modal-section-title">Research Notes</div>
+      <div class="note-block" id="modalResearchNotes"></div>
+      <div class="modal-section-title">Outreach Notes</div>
+      <div class="note-block" id="modalOutreachNotes"></div>
+      <div class="modal-section-title">Follow-Up Notes</div>
+      <div class="note-block" id="modalFollowUpNotes"></div>
+      <div class="modal-section-title">Other Notes</div>
+      <div class="note-block" id="modalOtherNotes"></div>
+      <div class="modal-section-title">Add Note</div>
+      <textarea class="notes-input" id="newNoteInput" placeholder="Add a new timestamped note..."></textarea>
+      <div>
+        <button class="btn-primary" onclick="saveNote()">Save Note</button>
+        <button class="btn-secondary" onclick="openEmailForLead()">→ Generate Email</button>
+      </div>
+      <div class="saved-msg" id="noteSavedMsg" style="margin-top:10px">✓ Note saved</div>
+    </div>
+
+    <!-- TAB: EDIT -->
+    <div class="modal-tab-panel" id="mtab-edit">
+      <div class="edit-grid">
+        <div class="edit-field-group">
+          <label>First Name</label>
+          <input class="edit-input" id="ef-firstName" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Last Name</label>
+          <input class="edit-input" id="ef-lastName" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Title</label>
+          <input class="edit-input" id="ef-title" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Company Name</label>
+          <input class="edit-input" id="ef-company" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Email</label>
+          <input class="edit-input" id="ef-email" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Alternate Email</label>
+          <input class="edit-input" id="ef-altEmail" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Phone</label>
+          <input class="edit-input" id="ef-phone" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>City</label>
+          <input class="edit-input" id="ef-city" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>State</label>
+          <input class="edit-input" id="ef-state" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label># of Locations</label>
+          <input class="edit-input" id="ef-locs" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Licensed Capacities</label>
+          <input class="edit-input" id="ef-capacity" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Est. Business Value</label>
+          <input class="edit-input" id="ef-value" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Real Estate</label>
+          <input class="edit-input" id="ef-re" type="text" placeholder="e.g. Owns RE / Unable to verify">
+        </div>
+        <div class="edit-field-group">
+          <label>Website</label>
+          <input class="edit-input" id="ef-website" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>List Date</label>
+          <input class="edit-input" id="ef-listDate" type="text">
+        </div>
+        <div class="edit-field-group">
+          <label>Next Steps</label>
+          <input class="edit-input" id="ef-nextSteps" type="text">
+        </div>
+      </div>
+      <div class="edit-field-group">
+        <label>Research / Kim Notes</label>
+        <textarea class="edit-textarea" id="ef-researchNotes"></textarea>
+      </div>
+      <div class="edit-field-group">
+        <label>Outreach Notes</label>
+        <textarea class="edit-textarea" id="ef-outreachNotes"></textarea>
+      </div>
+      <div class="edit-field-group">
+        <label>Follow-Up Notes</label>
+        <textarea class="edit-textarea" id="ef-followUpNotes"></textarea>
+      </div>
+      <div class="edit-field-group">
+        <label>Other Notes</label>
+        <textarea class="edit-textarea" id="ef-otherNotes"></textarea>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-save" onclick="saveEdit()">💾 Save All Changes</button>
+        <button class="btn-cancel" onclick="cancelEdit()">Cancel</button>
+        <span class="saved-msg" id="editSavedMsg" style="margin-left:8px">✓ Changes saved!</span>
+      </div>
+    </div>
+
+    <!-- TAB: RESEARCH -->
+    <div class="modal-tab-panel" id="mtab-research">
+      <div class="research-header">
+        <div class="research-title">Call Prep Sheet</div>
+        <div class="research-actions">
+          <button class="btn-copy-research" id="copyResearchBtn" onclick="copyResearch()">📋 Copy Sheet</button>
+          <button class="btn-research" id="runResearchBtn" onclick="runResearch()">
+            <span>🔍</span> <span id="researchBtnLabel">Generate Prep Sheet</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- State sub-tabs (populated dynamically) -->
+      <div class="state-tabs" id="stateTabs"></div>
+
+      <div class="research-placeholder" id="researchPlaceholder">
+        <div style="font-size:32px;margin-bottom:12px">🔍</div>
+        <strong>No prep sheet yet for this lead.</strong><br>
+        Click <em>Generate Prep Sheet</em> to run AI-powered research across<br>
+        business news, real estate, preschool market, and demographics<br>
+        for this lead's location(s).
+      </div>
+
+      <div class="research-loading" id="researchLoading">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="spinner"></div>
+          <span>Researching with live web search...</span>
+        </div>
+        <div class="research-progress" id="researchProgress">Gathering market intelligence for this location...</div>
+      </div>
+
+      <!-- Prep sheet output (one per state, toggled by state tabs) -->
+      <div id="researchOutput"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== API CONFIG ====================
+// Netlify Function proxy — routes all Claude API calls server-side
+// so the API key never lives in the browser.
+function getApiUrl() {
+  return '/.netlify/functions/claude';
+}
+
+function getApiHeaders() {
+  return { 'Content-Type': 'application/json' };
+}
+
+// ==================== DATA ====================
+const RAW_LEADS = [{"List Source":"","Lead List Date":"1/5/2026","First Name":"Xavier","Last Name":"Lopez","Title":"","Company Name":"Jardin Spanish Immersion Academy","Email":"xavier@jardinmn.com","Alternate Email":"","Phone #":"612-751-3048","City":"Minneapolis, St. Paul","State":"MN","# of Loc":"10","Licensed Capacities":"","RE":"","Website":"https://jardinmn.com/","Business Value":"$56MM - $70MM","Kim/Research Notes":"Offering franchise opportunities; 8 of the 10 are owned by Founder & CEO, Xavier","OtherNotes":"952-999-7050 alternate number on LI","Outreach Notes":"weird voicemail- they listen to message and accept/decline.I got declined. Tried  three times. Left 1 voicemail. Sent follow up email.bcc to Notion.KP 1/9/26  www.jardinmn.com","Outreach Follow-Up Notes":"CALL 2/06/26 KP called again telling him I was sending the complimentary invitation to Value. Did not take call (weird voicemail that screens) EMAIL 2/06/26 Sent Value invitation","NEXT STEPS":"connect on LI"},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Dare","Last Name":"Woodruff","Title":"","Company Name":"Kids Educational Center","Email":"dare.woodruff@kidseducationalcenter.com","Alternate Email":"keckids_dare@bellsouth.net","Phone #":"(919) 625-9741","City":"Raleigh/Durham/Cary","State":"NC","# of Loc":"5","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"5 locations; average LC 133","OtherNotes":"","Outreach Notes":"1/9/26 called and left vociemail- got Apple screening and call was declined. Followed up with customized email. KP","Outreach Follow-Up Notes":"CALL 2/06/26 called again- weird machine that screened call- left message that I was sending inviation to Value. EMAIL 2/06/26 sent invitation email to Value","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Doris","Last Name":"Darko","Title":"","Company Name":"Kids Time Academy","Email":"doris@kidztymeacademy.com","Alternate Email":"","Phone #":"404-285-9979","City":"NorthWest Atlanta","State":"GA","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"Canton location website under construction","OtherNotes":"2/06/26 WRONG PHONE NUMBER REMOVE THE 404-285-9979, 2/06/26 KP researched and tried 770-356-4057 and was able to leave my number via SMS","Outreach Notes":"1/09/26 KP called and left voicemail. got Apple screening and call declined EMAIL followed up 1/09/26. bcc Notion","Outreach Follow-Up Notes":"KP EMAIL 2/06/26 KP sent complimentary Value email and cc Notion","NEXT STEPS":"need phone number"},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Linda","Last Name":"Tossas","Title":"","Company Name":"Learning City Academy","Email":"ltossas@tampabay.rr.com","Alternate Email":"","Phone #":"(917) 603-4618","City":"Miami, Ft Lauderdale, West Palm Beach","State":"FL","# of Loc":"7","Licensed Capacities":"","RE":"","Website":"https://www.learningcityacademy.com/","Business Value":"$10MM - $11MM","Kim/Research Notes":"this one looks viable","OtherNotes":"","Outreach Notes":"1/9/26 called and left voicemail. Researched this owner- looks strong.  Sent custom email and bcc to Notion. KP","Outreach Follow-Up Notes":"KP Called 2/06/26- friendly message inviting to Value- complimentary! 2/06/26 sent email with Value info","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Mukesh","Last Name":"Agarwal","Title":"","Company Name":"Loving Cup Kids Academy","Email":"mukesh@lovingcupkidsacademy.com","Alternate Email":"","Phone #":"440-716-1500","City":"Greater Cleveland","State":"OH","# of Loc":"10","Licensed Capacities":"","RE":"","Website":"no longer the owner!","Business Value":"-","Kim/Research Notes":"sold all 10 to multiple owners- 3 to one, 2 to one,  1 to Ruka (below)","OtherNotes":"","Outreach Notes":"1/9/26 call was declined. Left message and sent customized email. bcc Notion. KP","Outreach Follow-Up Notes":"LI to research the new owners? EA to research new owners?","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/6/2026","First Name":"Ruka","Last Name":"Saka","Title":"","Company Name":"Fairview Early Learning Center","Email":"Ruka bought 1/10 from above Mukesh","Alternate Email":"","Phone #":"440-716-1500 Fairview location","City":"Greater Cleveland","State":"OH","# of Loc":"1","Licensed Capacities":"","RE":"","Website":"","Business Value":"-","Kim/Research Notes":"","OtherNotes":"new email: fairviewelc@gmail.com","Outreach Notes":"EMAIL 2/06/26 emailed Ruka info about Hinge and SHIFT.","Outreach Follow-Up Notes":"RESEARCH- KP 2/06/26- too small- 90 LC- highlights government subsidy and low income outreach. CALL 2/06/26 KP called number and asked for Musesh- he has sold all 10 to multiple people. Ruka bought the Fairview one. She was lovely. I told her about Value but decided not to give the complimentary ticket since only one location. will invite to SHIFT.","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Tammy","Last Name":"Compton","Title":"","Company Name":"Miss Tammy's Little Learning Center","Email":"misstammysllc@yahoo.com","Alternate Email":"","Phone #":"(864) 415-3778","City":"Spartanburg County, Polk County","State":"SC, NC","# of Loc":"6","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/9/26 called and left voimeamail. Call was screened and declined. Sent follow up email and bcc Notion. NOTE- 1/19/26 asked Nan/Jenny about this one and they think it's pretty weak. KP","Outreach Follow-Up Notes":"2/06/26 CALL Called Tammy-left friendly email inviting to Value and emphasized the Greenville location. EMAILED invitation.","NEXT STEPS":"LI and EA"},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Adam","Last Name":"Zablud","Title":"","Company Name":"Oak Village Academy","Email":"azablud@oakvillageacademy.com","Alternate Email":"azablud@gmail.com","Phone #":"919-418-1486","City":"Cary","State":"NC","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"KL HAS PREVIOUS RELATIONSHIP","OtherNotes":"","Outreach Notes":"-","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Alexander","Last Name":"Okoma","Title":"","Company Name":"Prime Care Learning Center","Email":"alex@primecarelearning.com","Alternate Email":"","Phone #":"(770) 997-3435","City":"Riverdale, Stone Mountain, McDonough","State":"GA","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"https://www.primecarelearning.com/","Business Value":"$7MM - $9MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/9/26 Called and spoke with director at McDonough location. Told me is usually is in after 3 pm. Followed up with customized email. I mentoned I had just been in McDonough a few weeks ago! bbc to Notion.","Outreach Follow-Up Notes":"CALL 2/06/26 called and spoke with teacher- kids were loud- Mr. Alex has gone for the day. left my name. EMAIL 2/06/26 emailed COMPLIMENTARY invitation to Value","NEXT STEPS":"LI and EA"},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Bill","Last Name":"Batts","Title":"","Company Name":"Small World Child Care Center & Preschool","Email":"bill.batts@smallworld.se","Alternate Email":"","Phone #":"919-922-2280","City":"Goldsboro","State":"NC","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"KL HAS PREVIOUS RELATIONSHIP","OtherNotes":"","Outreach Notes":"-","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/5/2026","First Name":"Aparna","Last Name":"Banka","Title":"","Company Name":"Stepping Stone Montessori","Email":"aparna@steppingstonemontessori.com","Alternate Email":"","Phone #":"(404) 271-2755","City":"Sugar Hill, Cumming","State":"GA","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/9/26 callled and left voicemail. Declined call. sent customized email and bcc Notion. KP","Outreach Follow-Up Notes":"CALL 2/06/26 Another declined call and another vociemail left= this time about Value. EMAIL 2/07/26 Customized email about Value and asking for a chat! cc-ed Notion","NEXT STEPS":"research and LI, EA, check out website"},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Brian","Last Name":"Maze","Title":"","Company Name":"A Child's Place","Email":"mazesoccer@yahoo.com","Alternate Email":"","Phone #":"(847) 668-4557","City":"Greater Chicago Metro","State":"IL","# of Loc":"4","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"CALL 1/21/26  No answer. Left perky voicmail. Offered growth and market Valuation. EMAIL 1/21/26 Sent email follow up and cc-ed Notion.","Outreach Follow-Up Notes":"CALL 2/06/26 KP called again telling him I was sending the complimentary invitation to Value. Did not take call (weird voicemail that screens) EMAIL 2/07/26 Sent Value invitation with offer to chat.","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Michele","Last Name":"Hill","Title":"","Company Name":"Kidazzle Child Care","Email":"michelehill@kidazzle.com","Alternate Email":"","Phone #":"610-349-8448","City":"Atlanta, Memphis, Miami","State":"GA, TN, FL","# of Loc":"7","Licensed Capacities":"","RE":"","Website":"https://kidazzle.com/","Business Value":"$10MM - $12MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Ricardo","Last Name":"Diaz","Title":"","Company Name":"First Impressions Academy & Preschools","Email":"ricardo.diaz@live.com","Alternate Email":"","Phone #":"305-206-6614","City":"Palm Beach County","State":"FL","# of Loc":"4","Licensed Capacities":"","RE":"","Website":"-","Business Value":"$7MM - $8MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/21/26 CALL voicemail introducing self. EMAIL Sent email follow up 1/21/26","Outreach Follow-Up Notes":"EMAIL 2/07/26 sent email with complimentary offer for Value cc-ed Notion","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Timothy","Last Name":"Burpee","Title":"","Company Name":"Foundation Academy","Email":"lukeburpee@foundation-academy.com","Alternate Email":"timothylukeburpee@gmail.com","Phone #":"(706) 319-9117","City":"Atlanta, Macon, Central, NE","State":"GA","# of Loc":"5","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/21/26  CALL No answer. Left voicmail. Offered growth and market valuation. 1/21/26 EMAIL Sent email follow up and cc-ed Notion! KP","Outreach Follow-Up Notes":"2/06/26 CALL left another voicemail this time about offer to chat and Value Workshop. 2/07/26 EMAIL sent email with complimentary ticket to Valueand offer to chat. bcc-Notion.","NEXT STEPS":"research and LI, EA, check out website"},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Kevin","Last Name":"Hojnacki","Title":"","Company Name":"Kayfield Academy","Email":"kevin.hojnacki@kayfieldacademy.com","Alternate Email":"mhojnacki@twc.com","Phone #":"(859) 537-1448","City":"Louisville","State":"KY","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"1/21/26  No answer. Left voicmail. Offered growth and market valuation. Sent email follow up! KP","Outreach Follow-Up Notes":"CALL 2/06/26 voicemail to look for upcoming email with Value complimentary offer.  EMAIL 2/07/27 Customized email sent. cc-ed Notion","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Susan","Last Name":"Elam","Title":"","Company Name":"Kids' Stop Learning Center","Email":"lanceelam@gmail.com","Alternate Email":"","Phone #":"(706) 295-7867","City":"Rome, Cartersville","State":"GA","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"-","Business Value":"-","Kim/Research Notes":"2","OtherNotes":"","Outreach Notes":"1/21/26  No answer. Left voicmail. Offered growth and market valuation. Sent email follow up! KP","Outreach Follow-Up Notes":"2/06/26  CALL voicemail message to look for an email with complimentary ticket to VALUE. EMAIL 2/07/26 Customized email to look for complimentary ticket offer. cc-ed Notion","NEXT STEPS":"research"},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Tricia & Stacy","Last Name":"Sarver & Sarver-Greene","Title":"","Company Name":"Kid's World Learning Center","Email":"NO email addresses online","Alternate Email":"","Phone #":"804-818-3239 WRONG NUMBER","City":"Richmond","State":"VA","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"www.kidsworldlearningcenters.com","Business Value":"-","Kim/Research Notes":"need email! KP's -Christian schools with ABEKA curriculum.  Founders' daughters run schools now-  KP 1/26/26","OtherNotes":"https://www.kidsworldlearningcenters.com/","Outreach Notes":"1/21/2026 CALL KP called and left voicemail offering growth valuation. KP reached Stacy 1/27/26- not remotely interested in a valuation. too much going on- Covid, dad died, super overwhelmed. It's ok with her if I send her info about HINGE. I spoke with her about joining VCCA and the advocacy work and will send her that info too.","Outreach Follow-Up Notes":"takes subsidy- YES","NEXT STEPS":"research and LI, EA, send info about VCCA"},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Fiaza","Last Name":"Haniffa","Title":"","Company Name":"","Email":"fiaza@aol.com","Alternate Email":"","Phone #":"work (703) 237-0266","City":"Northern VA, Washington, DC","State":"VA","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"","Business Value":"-","Kim/Research Notes":"Yahoo email came back!! Remove please!","OtherNotes":"2/06/26 EMAIL- sent offer for complimentary Value ticket- second email bounced back","Outreach Notes":"","Outreach Follow-Up Notes":"","NEXT STEPS":"need correct email!"},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Cheryl","Last Name":"Cavanaugh","Title":"","Company Name":"New Beginnings Childcare Center","Email":"jodycavanaugh@gmail.com","Alternate Email":"cherylnchlsn@yahoo.com","Phone #":"910-324-4256","City":"Richland, Jacksonville","State":"NC","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"","Business Value":"-","Kim/Research Notes":"Cheryl's email came back","OtherNotes":"","Outreach Notes":"1/21/26  No answer. Left voicmail. Offered growth and market valuation. Sent email follow up! KP","Outreach Follow-Up Notes":"CALL 2/06/26 VOICEMAIL MESSAGE about Value EMAIL 2/06/26 EMAILED invitation about Value","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/19/2026","First Name":"Lynette","Last Name":"Mitcham","Title":"","Company Name":"Towne Square Academy","Email":"lynettemitcham@hotmail.com","Alternate Email":"","Phone #":"(678) 432-7043","City":"Atlanta Metro","State":"GA","# of Loc":"4","Licensed Capacities":"","RE":"","Website":"","Business Value":"-","Kim/Research Notes":"wrong phone number KP found and added website,","OtherNotes":"1/29/26 KP called- wrong number!","Outreach Notes":"2/06/26 KP tried to find phone numbers- none on website!","Outreach Follow-Up Notes":"2/06/26 NOTE- KP researched and found MANY licensing violations and issues for Green Valley. NOTE RIVERDALE AND NORCROSS are HOME BASED. 2/06/26 KP sent email inviting to Value.","NEXT STEPS":"NOT SURE THIS ONE IS VIABLE. KP 2/06/26"},{"List Source":"","Lead List Date":"1/28/2026","First Name":"Sandra","Last Name":"Blackman","Title":"","Company Name":"Rising Stars of North Carolina","Email":"sandra@hooksalarm.com","Alternate Email":"","Phone #":"910-279-4618","City":"Wilmington area","State":"NC","# of Loc":"6","Licensed Capacities":"","RE":"","Website":"https://childcarerisingstars.com/","Business Value":"-","Kim/Research Notes":"RESEARCH- KP RESEARCHED WEBSITE- FOUND ADDITIONAL LOCATIONS, nice website- looks viable- need to find out LC","OtherNotes":"CALL-1/29/26 KP called and introduced self and HINGE. Mentioned my work with NCLCCA.","Outreach Notes":"EMAIL 2/06/26 EMAILED invitation to Value- complimentary","Outreach Follow-Up Notes":"2/07/26 EMAIL RESPONSE. UGH! NO LONGER IN ECE. Remove her number and email. KP","NEXT STEPS":"LI and EA for more research"},{"List Source":"","Lead List Date":"1/28/2026","First Name":"Trista","Last Name":"Gambill","Title":"","Company Name":"Epic Learning Center","Email":"trista@epiclc.org","Alternate Email":"tristagambill@gmail.com","Phone #":"(870) 275-5537","City":"Shreveport-Bossier City Metro","State":"LA","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"https://www.epiclc.org/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"CALL 1/29/26 called voicemail and introduced myself, fellow owner, HINGE services. mentioned my work with CCAL and Cindy Bishop.","Outreach Follow-Up Notes":"2/06/26 CALL called- voicemail  and reintroduced myself to Trista, told her about Value  2/06/26 Sent email about complimentary invitation to Value. cc Notion","NEXT STEPS":"LI and EA for more research"},{"List Source":"","Lead List Date":"1/28/2026","First Name":"Shawn","Last Name":"Corpening","Title":"","Company Name":"A New Beginning Children's Learning Center","Email":"shawncorpening@aol.com","Alternate Email":"","Phone #":"828-726-8630","City":"Greater Hickory, Metro Charlotte","State":"NC","# of Loc":"3","Licensed Capacities":"","RE":"","Website":"https://www.anbchildcare.com/","Business Value":"-","Kim/Research Notes":"NICE WEBSITE - this looks good. Need owner's email.","OtherNotes":"CALL 1/29/26 KP called and left voicemail introducing self, fellow owner, my work at NCLCCA. ASKED FOR A CALL BACK","Outreach Notes":"CALL 2/6/2026 called and left another message- introducing HINGE, said to look for invitation for VALUE.","Outreach Follow-Up Notes":"EMAIL 2/06/26 sent email with complimentary offer for Value","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/28/2026","First Name":"Jennifer","Last Name":"Adams Dock","Title":"","Company Name":"The Little School","Email":"jennifer@thelittleschool.net","Alternate Email":"","Phone #":"919-923-2446","City":"Raleigh-Durham","State":"NC","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"https://thelittleschool.net/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"CALL 1/29/26 KP called and left voicemail introducing self, fellow owner, my work at NCLCCA. ASKED FOR A CALL BACK","Outreach Notes":"CALL 2/06/26 called and again got voicemail. Left message about Value.","Outreach Follow-Up Notes":"EMAIL 2/06/26 sent email with complimentary offer for Value","NEXT STEPS":""},{"List Source":"","Lead List Date":"1/28/2026","First Name":"Karen","Last Name":"Boney","Title":"","Company Name":"Early Impressions","Email":"coffee4lif@aol.com","Alternate Email":"","Phone #":"904-382-3726","City":"Jacksonville MSA","State":"FL","# of Loc":"2","Licensed Capacities":"","RE":"","Website":"https://www.earlyimpressionsfl.com/index.html","Business Value":"-","Kim/Research Notes":"LC 181 & 62","OtherNotes":"incorrect phone number 1/29/26 KP","Outreach Notes":"EMAIL 2/06/26 EMAILED invitation to Value- complimentary","Outreach Follow-Up Notes":"","NEXT STEPS":"research and LI, EA"},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Allison","Last Name":"Frye","Title":"","Company Name":"Concord Children's Academy","Email":"afrye32@yahoo.com","Alternate Email":"allisoncca@gmail.com","Phone #":"-","City":"Concord","State":"NC","# of Loc":"1","Licensed Capacities":"","RE":"Unable to verify RE ownership","Website":"https://concordchildrensacademy.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"2/17/26 KP called- Allison not available","Outreach Notes":"2/16/26 KP sent introduction email.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Rick","Last Name":"Field","Title":"","Company Name":"Field of Dreams Nurture and Education Center","Email":"rickefield@gmail.com","Alternate Email":"fieldre@hotmail.com","Phone #":"(803) 984-0674","City":"Fort Mill","State":"SC","# of Loc":"2","Licensed Capacities":"","RE":"-","Website":"https://fieldofdreamscenter.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/16/26 called both location. Rick not available at the moment. Gave my info. No response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Robin","Last Name":"Sedillo","Title":"","Company Name":"Harbor View Creative Learning Center","Email":"resedillo@hotmail.com","Alternate Email":"-","Phone #":"719-304-1909","City":"Matthews","State":"NC","# of Loc":"1","Licensed Capacities":"","RE":"Unable to verify RE ownership","Website":"https://www.harborviewnc.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/17/26 KP called for Robin. Director said she'd call me back. 3/03/26 KP called for Robin. Out of town at the moment.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Renee","Last Name":"Mobley","Title":"","Company Name":"Oakcrest Preparatory Academy","Email":"gwnolee@aol.com","Alternate Email":"renee.mobley@dizzion.com","Phone #":"(704) 763-5545","City":"Charlotte","State":"NC","# of Loc":"4","Licensed Capacities":"","RE":"-","Website":"https://oakcrestprep.com/","Business Value":"$29MM - $35MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/19/26 KP researched. Good lead- 2/19/26 called for Renee- not usually at this location.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Kristen","Last Name":"Williams","Title":"","Company Name":"Quarks Academy","Email":"kristen@quarksacademy.com","Alternate Email":"kekraut@yahoo.com","Phone #":"(479) 252-2279","City":"Fort Mill","State":"SC","# of Loc":"1","Licensed Capacities":"","RE":"Unable to verify RE ownership","Website":"https://www.quarksacademy.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/19/26 researched this location- iffy?   2/19/26 KP left message for Kristen","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Kelley","Last Name":"Huff","Title":"","Company Name":"Richfield Child Development Center","Email":"kelleyhuff2003@yahoo.com","Alternate Email":"k.huff@richfieldcdc.com","Phone #":"(704) 985-2477","City":"Richfield","State":"NC","# of Loc":"1","Licensed Capacities":"","RE":"Owns RE","Website":"https://www.richfieldcdc.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/19/26 researched. Need to find out LC. 2/20/26  left message for  Kelley.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Cynthia & Ray","Last Name":"Kennedy","Title":"","Company Name":"University Child Development Center","Email":"RayKennedy@ramsey-peele.com","Alternate Email":"cdk1109@gmail.com; ucdc88@gmail.com","Phone #":"-","City":"Charlotte","State":"NC","# of Loc":"3","Licensed Capacities":"","RE":"-","Website":"https://universitycdc.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/20/26 KP spoke with director at length. Told her about Value workshop. Sounds like there is some changes going on within company/family. Research further.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/16/2026","First Name":"Chelsea","Last Name":"Cosper/Mitchell","Title":"","Company Name":"Wallburg Academy","Email":"chelsey@wallburgacademy.com","Alternate Email":"-","Phone #":"-","City":"Winston-Salem","State":"NC","# of Loc":"1","Licensed Capacities":"","RE":"Owns RE","Website":"https://www.wallburgacademy.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"2/16/26 KP sent introduction email.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"Shannon","Last Name":"Chandler","Title":"","Company Name":"A Kid's World","Email":"kidsworld@bellsouth.net","Alternate Email":"-","Phone #":"404-402-1830(cell)?","City":"Loganville, Covington, Jackson","State":"GA","# of Loc":"3","Licensed Capacities":"","RE":"Owns some RE","Website":"https://akidsworldonline.com/","Business Value":"-","Kim/Research Notes":"good website, GA organics, wellness commitment and governor award","OtherNotes":"","Outreach Notes":"left message 2/25, email sent  4/01/26 KP called all 3 locations. No call back.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"James","Last Name":"Kaiser","Title":"","Company Name":"All About Kids","Email":"jkaiser@aaklakota.com & jkaiser@allaboutkidslc.com","Alternate Email":"james@allaboutkidslc.com","Phone #":"513-463-0222 or 513-227-0545","City":"Greater Cincinnati, Central OH, Dayton. Lexington KY","State":"OH, KY","# of Loc":"16","Licensed Capacities":"","RE":"-","Website":"https://www.allaboutkidslc.com/","Business Value":"$72MM - $89MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"3/25/26 KP researched website. Left message and emailed valuation offer. No response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"Davaughn","Last Name":"Sims","Title":"","Company Name":"All Around Children","Email":"davaughnsims@yahoo.com","Alternate Email":"bsims896@gmail.com","Phone #":"216-673-0056","City":"Cleveland Metro","State":"OH","# of Loc":"8","Licensed Capacities":"","RE":"-","Website":"https://www.allaroundchildren.com/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"3/26/26 KP researched website. Left message and emailed valuation offer. No response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"Yvonne","Last Name":"Thomas-Curry","Title":"","Company Name":"Precious Babies Learning Academy","Email":"preciousbabieslearningacademy@verizon.net","Alternate Email":"yswatson@gmail.com","Phone #":"(716) 874-1315","City":"Philadelphia","State":"PA","# of Loc":"6","Licensed Capacities":"","RE":"-","Website":"-","Business Value":"-","Kim/Research Notes":"Disengaged lead - Rich Nurturing in GEORGE - no history/email correspondence","OtherNotes":"","Outreach Notes":"3/25/26 KP researched website. Left message and emailed valuation offer. No response. 4/02/26 KP emailed and referenced Rich as my colleague.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"Kae","Last Name":"Wong","Title":"","Company Name":"Sunshine Learning Center","Email":"kaewong79@gmail.com","Alternate Email":"kwong@sunshinenewyork.com","Phone #":"6012-306-3394","City":"New York City","State":"NY","# of Loc":"8","Licensed Capacities":"","RE":"-","Website":"https://www.sunshinenewyork.com/","Business Value":"$34MM - $41MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"3/25/26 KP researched website. Left message and emailed valuation offer. No response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"","Lead List Date":"2/23/2026","First Name":"Jessica","Last Name":"Hoffman","Title":"","Company Name":"The Barrington School","Email":"jessaroby@aol.com","Alternate Email":"-","Phone #":"614-506-9040","City":"Greater Columbus","State":"OH","# of Loc":"12","Licensed Capacities":"","RE":"-","Website":"https://www.thebarringtonschool.com/","Business Value":"$46MM - $57MM","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"3/25/26 KP researched website. Left message and emailed valuation offer. No response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Angie","Last Name":"Williams","Title":"president","Company Name":"Especially For Children","Email":"angiew@especiallyforchildren.com","Alternate Email":"-","Phone #":"(952) 835-6055","City":"Circle Pines","State":"MN","# of Loc":"9","Licensed Capacities":"LCs 116, 99, 124, 98, 77, 124, 119, 66, 143","RE":"-","Website":"https://especiallyforchildren.com/","Business Value":"-","Kim/Research Notes":"-","OtherNotes":"-","Outreach Notes":"3/26/26 KP left messages at 3 locations, no response.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Calin","Last Name":"Moigradan","Title":"CEO","Company Name":"LadyBug & Friends Daycare and Preschool","Email":"calin@ladybug-daycare.com","Alternate Email":"calin@ladybugdp.com","Phone #":"(773) 961-4854","City":"Mt Prospect","State":"IL","# of Loc":"9","Licensed Capacities":"LCs 93, 23, 112, 109, 93, 72, 126, 121, 57","RE":"-","Website":"https://ladybug-daycare.com/","Business Value":"-","Kim/Research Notes":"Owner in GEORGE; No Deal; Rich Nurturing","OtherNotes":"-","Outreach Notes":"3/27/26 KP left message with director.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Luisa","Last Name":"Fuentes","Title":"owner & CEO","Company Name":"Rayito de Sol Spanish Immersion Early Learning Center","Email":"luchita@rayito.org","Alternate Email":"luchita@rayitoschools.com","Phone #":"(763) 545-1790","City":"Chicago","State":"IL","# of Loc":"9","Licensed Capacities":"LCs 219, 148, 60, 112, 143, 80, 34","RE":"-","Website":"https://www.rayitoschools.com/","Business Value":"$20MM - $25MM","Kim/Research Notes":"-","OtherNotes":"-","Outreach Notes":"3/26/26 KP left message   4/01/26 emailed asking for a brief call.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Nicole","Last Name":"Chaudry","Title":"founder and CEO","Company Name":"WorldKids School","Email":"nicole@worldkidsschool.com","Alternate Email":"nicole_chaudry@hotmail.com","Phone #":"(206) 853-2178","City":"Seattle","State":"WA","# of Loc":"9","Licensed Capacities":"Franchisor","RE":"-","Website":"https://worldkidsschool.com/","Business Value":"-","Kim/Research Notes":"-","OtherNotes":"KP- Beautiful schools and website. High end franchise- strong lead.","Outreach Notes":"KP called and left messages on 3/25 and 3/26. KP also left messages on 4/01/26. KP 4/20/26 Emailed alerting her to upcoming Thrive and SHIFT and free valuation available now.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Tristram E.","Last Name":"Collins","Title":"CEO","Company Name":"Imagine Early Education & Childcare","Email":"tristramcollins@comcast.net","Alternate Email":"tcollins@imaginechild.com","Phone #":"(732) 899-2313","City":"-","State":"TX, CO, OK","# of Loc":"8","Licensed Capacities":"LCs 238, 118, 656, 644, 629, 383, 361, 282","RE":"-","Website":"https://www.imaginechild.com/","Business Value":"$80MM - $99MM","Kim/Research Notes":"-","OtherNotes":"-","Outreach Notes":"KP-3/27/26 initial research. KP 4/20/26- Sent email inviting to conferences and introducing myself and HINGE.","Outreach Follow-Up Notes":"Gorgeous locations. Very upscale interiors. Commercial looking- bowling alley, kitchens, computer lab. High end amenities.","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Skip","Last Name":"Davison","Title":"owner","Company Name":"Quality Child Care Early Learning Center","Email":"skip.davidson@dlf-ar.com","Alternate Email":"-","Phone #":"","City":"Little Rock","State":"AR","# of Loc":"7","Licensed Capacities":"LCs 121, 170, 91, 85, 132, 103, 115","RE":"-","Website":"https://qualitychildcareinc.com/","Business Value":"-","Kim/Research Notes":"-","OtherNotes":"","Outreach Notes":"3/26/26 Called 2 locations asking for Skip. 4/20/26 left message for Beth asking for a call and Skip's phone number. 4/20/26 Emailed Skip.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW/TW2","Lead List Date":"3/24/2026","First Name":"Greg","Last Name":"Owen","Title":"CFO & owner","Company Name":"Talented Tots","Email":"gower@talentedtots.org","Alternate Email":"greg@talentedtots.org","Phone #":"","City":"Kansas City","State":"MO","# of Loc":"7","Licensed Capacities":"LCs 112, 80, 112, 135, 156, 104","RE":"-","Website":"https://www.talentedtots.org/","Business Value":"-","Kim/Research Notes":"","OtherNotes":"","Outreach Notes":"left message 3/25/26. 4/20/26 called multiple locations - Greg has SOLD all locations to multiple buyers including Natalie Walgren.","Outreach Follow-Up Notes":"Greg is a RE developer. 6 locations: Liberty, Platte City, Parkville, Excelsior Springs, Kearny, Smithville","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Cesia","Last Name":"Acosta","Title":"co-founder","Company Name":"Smart Start Academy","Email":"cesiaa@smart-startacademy.com","Alternate Email":"cesiaa@aol.com","Phone #":"201-232-1115","City":"Jersey City","State":"NJ","# of Loc":"8","Licensed Capacities":"73, 46, 68, 58, 45, 101, 57","RE":"-","Website":"https://smart-startacademy.com/","Business Value":"$15M - $18M","Kim/Research Notes":"Attended VALUE NYC; 8th location appears to be administrative/corporate location","OtherNotes":"-","Outreach Notes":"THIS LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"EMAIL SENT/Voicemail left 5/15/26","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Shelly","Last Name":"Keller","Title":"CEO","Company Name":"Kids Unlimited Learning Academy","Email":"shellykeller@mymiraclekids.com","Alternate Email":"-","Phone #":"870-761-6680","City":"Fort Smith","State":"AR","# of Loc":"7","Licensed Capacities":"204, 74, 108, 219, 149, 50","RE":"-","Website":"https://mykidsunlimited.com/","Business Value":"N/A","Kim/Research Notes":"-","OtherNotes":"5/08/26 left voicemail. 5/15/26 left follow up voicemail with the valuation offer. Sent email according to script from Tom","Outreach Notes":"This LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"EMAIL SENT/Voicemail left 5/15/26","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Edward","Last Name":"Shmit","Title":"owner","Company Name":"Teddy Bear Day Care Centers","Email":"eric.schmit@friendly-ford.net","Alternate Email":"-","Phone #":"-","City":"Chicago","State":"IL","# of Loc":"6","Licensed Capacities":"106, 89, 166, 85, 79, 62","RE":"-","Website":"https://teddybeardaycare.com/","Business Value":"$8M - $9M","Kim/Research Notes":"-","OtherNotes":"5/08/26 tried to find phone number- no luck! 5/15/26 no phone number so I sent email offering valuation.","Outreach Notes":"THIS LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"EMAIL SENT/NEED TO CHECK FOR PHONE NUMBER 5/15/26","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Jana","Last Name":"Kirchhoff","Title":"","Company Name":"First Steps Learning Centers","Email":"jana512@hotmail.com","Alternate Email":"-","Phone #":"210-818-0699","City":"Galveston","State":"TX","# of Loc":"6","Licensed Capacities":"170, 136, 113, 126, 135, 104","RE":"-","Website":"https://kandilandschools.org/","Business Value":"$10M - $11M","Kim/Research Notes":"","OtherNotes":"5/06/26 no answer, no voicemail. 5/15/26 left voicemail, sent email - EMAIL BOUNCED BACK","Outreach Notes":"THIS LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"EMAIL SENT 5/15/26/EMAIL BOUNCED BACK","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Mary","Last Name":"Sears","Title":"owner","Company Name":"Mary Sears Children's Academy","Email":"mary_sears@mary-sears-academy.com","Alternate Email":"-","Phone #":"(708) 460-4414","City":"Orland Park","State":"IL","# of Loc":"5","Licensed Capacities":"116, 86, 192, 162, 103","RE":"-","Website":"https://www.mary-sears-academy.com/","Business Value":"$11.6M - $12.5M","Kim/Research Notes":"-","OtherNotes":"5/06/26 called no answer. 5/15/26 called- mailbox full. Sent email.","Outreach Notes":"THIS LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"","NEXT STEPS":""},{"List Source":"TW3","Lead List Date":"4/21/2026","First Name":"Annalee","Last Name":"Alexander","Title":"","Company Name":"Imagination Early Learning Center","Email":"annalee_mcclintock@yahoo.com","Alternate Email":"-","Phone #":"812-767-1342, 812-346-6790 (office)","City":"North Vernon","State":"IN","# of Loc":"5","Licensed Capacities":"104, 375","RE":"-","Website":"https://www.imaginationdaycareandpreschool.com/","Business Value":"N/A","Kim/Research Notes":"Looks fairly weak- promotes subsidy and lower income families.","OtherNotes":"5/4/26 called no answer. 5/15/26 called- voicemail full. Called office, left message. Email sent three times and would not go through.","Outreach Notes":"THIS LIST WAS ON PAUSE AS I WAITED FOR KIM TO DO THE VALUATIONS. calls did not start until May 4th.","Outreach Follow-Up Notes":"Email bounced/would not go through. Need to check email accuracy. KP 5/15/26","NEXT STEPS":""}];
+
+// ==================== STATE ====================
+const STAGES = [
+  { id: 'new', label: 'New', cls: 'stage-new' },
+  { id: 'no-answer', label: 'No Answer', cls: 'stage-no-answer' },
+  { id: 'voicemail', label: 'Voicemail Left', cls: 'stage-voicemail' },
+  { id: 'connected', label: 'Connected', cls: 'stage-connected' },
+  { id: 'followup', label: 'Follow-up Scheduled', cls: 'stage-followup' },
+  { id: 'valuation', label: 'Valuation Offered', cls: 'stage-valuation' },
+  { id: 'nurturing', label: 'Nurturing', cls: 'stage-nurturing' },
+  { id: 'dead', label: 'Not Viable', cls: 'stage-dead' },
+];
+
+let leads = [];
+let sortKey = 'name';
+let sortDir = 1;
+let currentLeadIdx = null;
+
+function inferStage(lead) {
+  const all = ((lead['Outreach Notes'] || '') + ' ' + (lead['Outreach Follow-Up Notes'] || '') + ' ' + (lead['NEXT STEPS'] || '') + ' ' + (lead['OtherNotes'] || '')).toLowerCase();
+  const ns = (lead['NEXT STEPS'] || '').toLowerCase();
+  if (ns.includes('not sure this one is viable') || all.includes('no longer in ece') || all.includes('not viable')) return 'dead';
+  if (all.includes('valuation offered') || all.includes('invitation to value') || all.includes('email sent') && all.includes('voicemail left')) return 'valuation';
+  if (all.includes('connected') || all.includes('spoke with') || all.includes('reached') || all.includes('she was lovely') || all.includes('spoke with director at length')) return 'connected';
+  if (all.includes('follow') && (all.includes('schedule') || all.includes('callback'))) return 'followup';
+  if (all.includes('voicemail') || all.includes('left message') || all.includes('left perky') || all.includes('email') && all.includes('sent')) return 'voicemail';
+  if (all.includes('no answer') || all.includes('not available') || all.includes('declined') || all.includes('screened')) return 'no-answer';
+  if (!lead['Outreach Notes'] || lead['Outreach Notes'] === '-' || lead['Outreach Notes'].trim() === '') return 'new';
+  return 'voicemail';
+}
+
+function initLeads() {
+  const stored = localStorage.getItem('hingeLeads_v2');
+  if (stored) {
+    leads = JSON.parse(stored);
+  } else {
+    leads = RAW_LEADS
+      .filter(r => r['First Name'] && r['First Name'].trim())
+      .map((r, i) => ({
+        id: i,
+        firstName: r['First Name'].trim(),
+        lastName: r['Last Name'].trim(),
+        title: r['Title'] || '',
+        company: r['Company Name'].trim(),
+        email: r['Email'].trim(),
+        altEmail: r['Alternate Email'] || '',
+        phone: r['Phone #'] || '',
+        city: r['City'] || '',
+        state: r['State'] || '',
+        locs: r['# of Loc'] || '',
+        capacity: r['Licensed Capacities'] || '',
+        re: r['RE'] || '',
+        website: r['Website'] || '',
+        value: r['Business Value'] || '-',
+        researchNotes: r['Kim/Research Notes'] || '',
+        otherNotes: r['OtherNotes'] || '',
+        outreachNotes: r['Outreach Notes'] || '',
+        followUpNotes: r['Outreach Follow-Up Notes'] || '',
+        nextSteps: r['NEXT STEPS'] || '',
+        listDate: r['Lead List Date'] || '',
+        addedNotes: [],
+        stage: inferStage(r),
+      }));
+    saveLeads();
+  }
+}
+
+function saveLeads() {
+  localStorage.setItem('hingeLeads_v2', JSON.stringify(leads));
+}
+
+// ==================== STATS ====================
+function updateStats() {
+  const active = leads.filter(l => !['dead','new'].includes(l.stage)).length;
+  const connected = leads.filter(l => l.stage === 'connected').length;
+  const valuation = leads.filter(l => l.stage === 'valuation').length;
+  const needAction = leads.filter(l => l.nextSteps && l.nextSteps.trim() && !['dead'].includes(l.stage)).length;
+  document.getElementById('statTotal').textContent = leads.length;
+  document.getElementById('statActive').textContent = active;
+  document.getElementById('statConnected').textContent = connected;
+  document.getElementById('statValuation').textContent = valuation;
+  document.getElementById('statNeedAction').textContent = needAction;
+}
+
+// ==================== TABLE ====================
+function getStageCls(stageId) {
+  return STAGES.find(s => s.id === stageId)?.cls || 'stage-new';
+}
+function getStageLabel(stageId) {
+  return STAGES.find(s => s.id === stageId)?.label || stageId;
+}
+
+function renderTable() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const stageF = document.getElementById('stageFilter').value;
+
+  let filtered = leads.filter(l => {
+    const txt = `${l.firstName} ${l.lastName} ${l.company} ${l.city} ${l.state}`.toLowerCase();
+    const matchSearch = !search || txt.includes(search);
+    const matchStage = !stageF || l.stage === stageF;
+    return matchSearch && matchStage;
+  });
+
+  filtered.sort((a, b) => {
+    let va, vb;
+    if (sortKey === 'name') { va = a.lastName; vb = b.lastName; }
+    else if (sortKey === 'company') { va = a.company; vb = b.company; }
+    else if (sortKey === 'location') { va = a.state; vb = b.state; }
+    else if (sortKey === 'locs') { va = parseInt(a.locs)||0; vb = parseInt(b.locs)||0; }
+    else if (sortKey === 'value') { va = a.value; vb = b.value; }
+    else if (sortKey === 'stage') { va = a.stage; vb = b.stage; }
+    if (va < vb) return -sortDir;
+    if (va > vb) return sortDir;
+    return 0;
+  });
+
+  const tbody = document.getElementById('leadsTableBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('rowCount').textContent = `Showing ${filtered.length} of ${leads.length} leads`;
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(l => {
+    const cls = getStageCls(l.stage);
+    const stageLabel = getStageLabel(l.stage);
+    const hasValue = l.value && l.value !== '-' && l.value !== 'N/A';
+    const hasRE = l.re && l.re.toLowerCase().includes('own');
+    const hasNextStep = l.nextSteps && l.nextSteps.trim();
+    return `<tr onclick="openModal(${l.id})">
+      <td>
+        <div class="lead-name">${l.firstName} ${l.lastName}</div>
+        <div class="lead-company">${l.email || '—'}</div>
+      </td>
+      <td>
+        <div style="font-weight:500">${l.company}</div>
+        <div class="lead-company">${l.phone || '—'}</div>
+      </td>
+      <td class="lead-location">${l.city ? l.city + ', ' : ''}${l.state}</td>
+      <td><span class="loc-count">${l.locs || '?'}</span></td>
+      <td>${hasValue ? `<span class="value-pill">${l.value}</span>` : '<span style="color:#bbb;font-size:12px">—</span>'}</td>
+      <td>${hasRE ? '<span class="re-owned">✓ RE</span>' : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
+      <td><span class="badge ${cls}"><span class="badge-dot"></span>${stageLabel}</span></td>
+      <td>${hasNextStep ? `<span class="next-step-tag" title="${l.nextSteps}">${l.nextSteps}</span>` : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="action-btn" onclick="openModal(${l.id})">View</button>
+        <button class="action-btn" style="background:var(--amber);margin-left:4px" onclick="openModalTab(${l.id},'edit')">Edit</button>
+        <button class="action-btn email-btn" onclick="openEmailForLeadId(${l.id})">Email</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterLeads() {
+  if (currentView === 'kanban') renderKanban();
+  else renderTable();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  renderTable();
+}
+
+// ==================== MODAL ====================
+let activeModalTab = 'overview';
+let researchData = {}; // keyed by leadId -> { states: { stateName: htmlContent } }
+
+function switchModalTab(tab) {
+  activeModalTab = tab;
+  document.querySelectorAll('.modal-tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['overview','edit','research'][i] === tab);
+  });
+  document.querySelectorAll('.modal-tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('mtab-' + tab).classList.add('active');
+
+  if (tab === 'edit') populateEditFields();
+  if (tab === 'research') initResearchTab();
+}
+
+function openModal(id) {
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  currentLeadIdx = id;
+  activeModalTab = 'overview';
+
+  document.getElementById('modalName').textContent = `${l.firstName} ${l.lastName}`;
+  document.getElementById('modalCompany').textContent = l.company + (l.title ? ` · ${l.title}` : '');
+
+  const sel = document.getElementById('modalStageSelect');
+  sel.innerHTML = STAGES.map(s => `<option value="${s.id}" ${l.stage === s.id ? 'selected' : ''}>${s.label}</option>`).join('');
+
+  const fields = [
+    ['Email', l.email + (l.altEmail ? ` / ${l.altEmail}` : '')],
+    ['Phone', l.phone || '—'],
+    ['Location', (l.city ? l.city + ', ' : '') + l.state],
+    ['# Locations', l.locs || '—'],
+    ['Licensed Capacity', l.capacity || '—'],
+    ['Est. Business Value', l.value || '—'],
+    ['Real Estate', l.re || '—'],
+    ['Website', l.website && l.website !== '-' ? `<a href="${l.website}" target="_blank">${l.website}</a>` : '—'],
+    ['List Date', l.listDate || '—'],
+    ['Next Steps', l.nextSteps || '—'],
+  ];
+  document.getElementById('modalGrid').innerHTML = fields.map(([lbl, val]) =>
+    `<div class="modal-field"><label>${lbl}</label><div class="field-val">${val}</div></div>`
+  ).join('');
+
+  const allAddedNotes = (l.addedNotes || []).map(n => `[${n.date}] ${n.text}`).join('\n\n');
+  document.getElementById('modalResearchNotes').textContent = l.researchNotes || '—';
+  document.getElementById('modalOutreachNotes').textContent = l.outreachNotes || '—';
+  document.getElementById('modalFollowUpNotes').textContent = (l.followUpNotes || '—') + (allAddedNotes ? '\n\n--- ADDED NOTES ---\n' + allAddedNotes : '');
+  document.getElementById('modalOtherNotes').textContent = l.otherNotes || '—';
+  document.getElementById('newNoteInput').value = '';
+  document.getElementById('stageSavedMsg').style.display = 'none';
+  document.getElementById('noteSavedMsg').style.display = 'none';
+
+  // reset to overview tab
+  document.querySelectorAll('.modal-tab-btn').forEach((b,i) => b.classList.toggle('active', i===0));
+  document.querySelectorAll('.modal-tab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function openModalTab(id, tab) {
+  openModal(id);
+  setTimeout(() => switchModalTab(tab), 50);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  currentLeadIdx = null;
+  if (currentView === 'kanban') renderKanban(); else renderTable();
+  updateStats();
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function updateStage() {
+  if (currentLeadIdx === null) return;
+  const l = leads.find(x => x.id === currentLeadIdx);
+  l.stage = document.getElementById('modalStageSelect').value;
+  saveLeads();
+  document.getElementById('stageSavedMsg').style.display = 'inline';
+  setTimeout(() => document.getElementById('stageSavedMsg').style.display = 'none', 2000);
+}
+
+function saveNote() {
+  if (currentLeadIdx === null) return;
+  const text = document.getElementById('newNoteInput').value.trim();
+  if (!text) return;
+  const l = leads.find(x => x.id === currentLeadIdx);
+  const now = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
+  if (!l.addedNotes) l.addedNotes = [];
+  l.addedNotes.push({ date: now, text });
+  saveLeads();
+  document.getElementById('newNoteInput').value = '';
+  document.getElementById('noteSavedMsg').style.display = 'block';
+  setTimeout(() => document.getElementById('noteSavedMsg').style.display = 'none', 2000);
+  const allAddedNotes = l.addedNotes.map(n => `[${n.date}] ${n.text}`).join('\n\n');
+  document.getElementById('modalFollowUpNotes').textContent = (l.followUpNotes || '—') + (allAddedNotes ? '\n\n--- ADDED NOTES ---\n' + allAddedNotes : '');
+  showToast('Note saved!');
+}
+
+function openEmailForLead() {
+  if (currentLeadIdx === null) return;
+  const id = currentLeadIdx;
+  closeModal();
+  setTimeout(() => openEmailForLeadId(id), 100);
+}
+
+// ==================== EDIT TAB ====================
+function populateEditFields() {
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l) return;
+  document.getElementById('ef-firstName').value = l.firstName || '';
+  document.getElementById('ef-lastName').value = l.lastName || '';
+  document.getElementById('ef-title').value = l.title || '';
+  document.getElementById('ef-company').value = l.company || '';
+  document.getElementById('ef-email').value = l.email || '';
+  document.getElementById('ef-altEmail').value = l.altEmail || '';
+  document.getElementById('ef-phone').value = l.phone || '';
+  document.getElementById('ef-city').value = l.city || '';
+  document.getElementById('ef-state').value = l.state || '';
+  document.getElementById('ef-locs').value = l.locs || '';
+  document.getElementById('ef-capacity').value = l.capacity || '';
+  document.getElementById('ef-value').value = l.value || '';
+  document.getElementById('ef-re').value = l.re || '';
+  document.getElementById('ef-website').value = l.website || '';
+  document.getElementById('ef-listDate').value = l.listDate || '';
+  document.getElementById('ef-nextSteps').value = l.nextSteps || '';
+  document.getElementById('ef-researchNotes').value = l.researchNotes || '';
+  document.getElementById('ef-outreachNotes').value = l.outreachNotes || '';
+  document.getElementById('ef-followUpNotes').value = l.followUpNotes || '';
+  document.getElementById('ef-otherNotes').value = l.otherNotes || '';
+  document.getElementById('editSavedMsg').style.display = 'none';
+}
+
+function saveEdit() {
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l) return;
+  l.firstName = document.getElementById('ef-firstName').value.trim();
+  l.lastName = document.getElementById('ef-lastName').value.trim();
+  l.title = document.getElementById('ef-title').value.trim();
+  l.company = document.getElementById('ef-company').value.trim();
+  l.email = document.getElementById('ef-email').value.trim();
+  l.altEmail = document.getElementById('ef-altEmail').value.trim();
+  l.phone = document.getElementById('ef-phone').value.trim();
+  l.city = document.getElementById('ef-city').value.trim();
+  l.state = document.getElementById('ef-state').value.trim();
+  l.locs = document.getElementById('ef-locs').value.trim();
+  l.capacity = document.getElementById('ef-capacity').value.trim();
+  l.value = document.getElementById('ef-value').value.trim();
+  l.re = document.getElementById('ef-re').value.trim();
+  l.website = document.getElementById('ef-website').value.trim();
+  l.listDate = document.getElementById('ef-listDate').value.trim();
+  l.nextSteps = document.getElementById('ef-nextSteps').value.trim();
+  l.researchNotes = document.getElementById('ef-researchNotes').value.trim();
+  l.outreachNotes = document.getElementById('ef-outreachNotes').value.trim();
+  l.followUpNotes = document.getElementById('ef-followUpNotes').value.trim();
+  l.otherNotes = document.getElementById('ef-otherNotes').value.trim();
+  saveLeads();
+  // Update header
+  document.getElementById('modalName').textContent = `${l.firstName} ${l.lastName}`;
+  document.getElementById('modalCompany').textContent = l.company + (l.title ? ` · ${l.title}` : '');
+  document.getElementById('editSavedMsg').style.display = 'inline';
+  setTimeout(() => document.getElementById('editSavedMsg').style.display = 'none', 2500);
+  showToast('Lead updated!');
+  populateEmailLeadSelect();
+}
+
+function cancelEdit() {
+  switchModalTab('overview');
+}
+
+// ==================== RESEARCH TAB ====================
+function initResearchTab() {
+  if (currentLeadIdx === null) return;
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l) return;
+
+  const states = parseStates(l.state);
+  renderStateTabs(states);
+
+  const saved = l.researchSheets;
+  if (saved && Object.keys(saved).length > 0) {
+    document.getElementById('researchPlaceholder').style.display = 'none';
+    document.getElementById('researchLoading').classList.remove('visible');
+    document.getElementById('copyResearchBtn').classList.add('visible');
+    document.getElementById('researchBtnLabel').textContent = 'Re-run Research';
+    renderSavedResearch(saved, states[0]);
+  } else {
+    document.getElementById('researchPlaceholder').style.display = 'block';
+    document.getElementById('researchOutput').innerHTML = '';
+    document.getElementById('copyResearchBtn').classList.remove('visible');
+    document.getElementById('researchBtnLabel').textContent = 'Generate Prep Sheet';
+  }
+  document.getElementById('researchLoading').classList.remove('visible');
+}
+
+function parseStates(stateStr) {
+  if (!stateStr || stateStr === '-') return ['Unknown'];
+  return stateStr.split(',').map(s => s.trim()).filter(Boolean);
+}
+
+function renderStateTabs(states) {
+  const tabsEl = document.getElementById('stateTabs');
+  if (states.length <= 1) { tabsEl.innerHTML = ''; return; }
+  tabsEl.innerHTML = states.map((s, i) =>
+    `<button class="state-tab-btn ${i===0?'active':''}" onclick="showStateResearch('${s}', this)">${s}</button>`
+  ).join('');
+}
+
+function showStateResearch(state, btn) {
+  document.querySelectorAll('.state-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (l && l.researchSheets && l.researchSheets[state]) {
+    document.getElementById('researchOutput').innerHTML = l.researchSheets[state];
+  }
+}
+
+function renderSavedResearch(sheets, defaultState) {
+  const state = defaultState || Object.keys(sheets)[0];
+  if (sheets[state]) {
+    document.getElementById('researchOutput').innerHTML = sheets[state];
+  }
+}
+
+async function runResearch() {
+  if (currentLeadIdx === null) return;
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l) return;
+
+  // Warn if overwriting
+  if (l.researchSheets && Object.keys(l.researchSheets).length > 0) {
+    if (!confirm('This will replace the existing prep sheet. Continue?')) return;
+  }
+
+  const states = parseStates(l.state);
+  const cities = l.city || '';
+
+  document.getElementById('researchPlaceholder').style.display = 'none';
+  document.getElementById('researchOutput').innerHTML = '';
+  document.getElementById('researchLoading').classList.add('visible');
+  document.getElementById('copyResearchBtn').classList.remove('visible');
+  document.getElementById('runResearchBtn').disabled = true;
+
+  l.researchSheets = {};
+  renderStateTabs(states);
+
+  for (let i = 0; i < states.length; i++) {
+    const state = states[i];
+    const relevantCities = cities; // pass all cities — Claude will focus on state
+    document.getElementById('researchProgress').textContent =
+      `Researching ${state} (${i+1} of ${states.length})...`;
+
+    try {
+      const html = await fetchResearchForState(l, state, relevantCities);
+      l.researchSheets[state] = html;
+    } catch(e) {
+      console.error("Research error for", state, e);
+      l.researchSheets[state] = `<div class="research-placeholder"><strong>Error for ${state}:</strong><br><code style="font-size:11px;color:#c00">${e.message}</code><br><br>Open the browser console (F12) for full details. Try again.</div>`;
+    }
+  }
+
+  saveLeads();
+  document.getElementById('researchLoading').classList.remove('visible');
+  document.getElementById('runResearchBtn').disabled = false;
+  document.getElementById('researchBtnLabel').textContent = 'Re-run Research';
+  document.getElementById('copyResearchBtn').classList.add('visible');
+
+  // Show first state
+  renderSavedResearch(l.researchSheets, states[0]);
+  // Update state tab buttons to be clickable
+  renderStateTabs(states);
+  showToast('Prep sheet ready!');
+}
+
+async function fetchResearchForState(lead, state, cities) {
+  const prompt = `You are a research assistant for Kathe Petchel, a Business Development Specialist at HINGE Early Education Advisors — a nationally recognized childcare business brokerage and advisory firm.
+
+Kathe is preparing to call ${lead.firstName} ${lead.lastName}, owner of ${lead.company}, which operates ${lead.locs || 'multiple'} early education locations in ${cities || state}, ${state}.
+
+Your job: Use web search to research this specific region and generate a CALL PREP SHEET that will help Kathe sound like a knowledgeable, credible peer on the call — not a cold caller. She wants to reference local conditions naturally in conversation.
+
+Research these four areas for ${cities ? cities + ', ' : ''}${state}:
+
+1. BUSINESS & ECONOMIC CLIMATE
+   - Recent business news, employer moves, economic growth or contraction
+   - Any notable real estate development, population trends, job market changes
+   - Is the area growing, declining, or stable?
+
+2. CHILDCARE REAL ESTATE MARKET
+   - Commercial property trends, lease rates, cap rates if available
+   - Any childcare facility sales, acquisitions, or notable real estate news
+   - Demand for childcare real estate vs. supply
+
+3. PRESCHOOL & ECE MARKET
+   - Local competition landscape (major operators, chains moving in or out)
+   - State licensing/regulatory environment — any recent changes in ${state}
+   - Demand indicators: waitlists, enrollment trends, tuition benchmarks
+   - Any notable ECE industry news specific to ${state}
+
+4. DEMOGRAPHICS & FAMILY TRENDS
+   - Birth rates, household income, family formation trends
+   - Population growth in the specific metro areas (${cities || state})
+   - Any trends relevant to demand for premium private childcare
+
+OUTPUT FORMAT — return ONLY valid HTML (no markdown, no code fences) structured exactly like this:
+
+<div class="prep-sheet visible">
+  <div class="prep-sheet-header">
+    <div>
+      <div class="prep-sheet-title">${lead.firstName} ${lead.lastName} — ${lead.company}</div>
+      <div class="prep-sheet-meta">${state} Market Intelligence · Generated ${new Date().toLocaleDateString()}</div>
+    </div>
+  </div>
+  <div class="prep-sheet-body">
+
+    <div class="prep-section-title">📰 Business & Economic Climate — ${state}</div>
+    <ul class="prep-bullets">
+      <li>[bullet 1 — specific local fact]</li>
+      <li>[bullet 2]</li>
+      <li>[bullet 3]</li>
+    </ul>
+
+    <div class="prep-section-title">🏠 Childcare Real Estate Market</div>
+    <ul class="prep-bullets">
+      <li>[bullet]</li>
+    </ul>
+
+    <div class="prep-section-title">🏫 Preschool & ECE Market — ${state}</div>
+    <ul class="prep-bullets">
+      <li>[bullet]</li>
+    </ul>
+
+    <div class="prep-section-title">👶 Demographics & Family Trends</div>
+    <ul class="prep-bullets">
+      <li>[bullet]</li>
+    </ul>
+
+    <div class="prep-section-title">💬 Suggested Conversation Openers</div>
+    <div class="prep-opener">"[Natural opener Kathe could say that references a local data point — sounds like a peer, not a sales pitch. E.g.: 'I was reading about the new Amazon distribution center opening in your area — that kind of employer growth usually drives demand for quality childcare...']"</div>
+    <div class="prep-opener">"[Second opener]"</div>
+    <div class="prep-opener">"[Third opener]"</div>
+
+  </div>
+</div>
+
+RULES:
+- Be specific. Use real city names, actual stats, named employers, real market data from your search.
+- Each section should have 2-4 bullets. Total: 8-12 intel bullets across all four sections.
+- The conversation openers should sound like something a smart, informed peer would naturally say — NOT a sales pitch.
+- If you can't find specific data for a sub-point, skip it rather than making something up.
+- Return ONLY the HTML block. No preamble, no explanation, no markdown.`;
+
+  const resp = await fetch(getApiUrl(), {
+    method: 'POST',
+    headers: getApiHeaders(),
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: prompt }]
+    })
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error('API ' + resp.status + ': ' + errText);
+  }
+
+  const data = await resp.json();
+
+  if (data.error) {
+    throw new Error('API error: ' + (data.error.message || JSON.stringify(data.error)));
+  }
+
+  const textBlocks = (data.content || []).filter(c => c.type === 'text').map(c => c.text);
+  const html = textBlocks.join('').replace(/```html?/gi,'').replace(/```/g,'').trim();
+
+  if (!html) {
+    console.error('Empty research response. Full API response:', JSON.stringify(data, null, 2));
+    throw new Error('No content returned (stop_reason: ' + (data.stop_reason || 'unknown') + ')');
+  }
+
+  return html;
+}
+
+function copyResearch() {
+  const l = leads.find(x => x.id === currentLeadIdx);
+  if (!l || !l.researchSheets) return;
+  // Get currently shown state
+  const activeStateBtn = document.querySelector('.state-tab-btn.active');
+  const state = activeStateBtn ? activeStateBtn.textContent : Object.keys(l.researchSheets)[0];
+  const html = l.researchSheets[state] || '';
+  // Strip tags for plain text copy
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const text = tmp.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('Prep sheet copied!'));
+}
+
+function openEmailForLeadId(id) {
+  switchTab('email');
+  const sel = document.getElementById('emailLeadSelect');
+  sel.value = id;
+  populateLeadFields();
+}
+
+// ==================== EMAIL GENERATOR ====================
+function populateEmailLeadSelect() {
+  const sel = document.getElementById('emailLeadSelect');
+  const sorted = [...leads].sort((a,b) => a.lastName.localeCompare(b.lastName));
+  sel.innerHTML = '<option value="">— Choose a lead —</option>' +
+    sorted.map(l => `<option value="${l.id}">${l.lastName}, ${l.firstName} — ${l.company}</option>`).join('');
+}
+
+function populateLeadFields() {
+  const id = parseInt(document.getElementById('emailLeadSelect').value);
+  if (isNaN(id)) return;
+  const l = leads.find(x => x.id === id);
+  if (!l) return;
+  document.getElementById('emailFirstName').value = l.firstName;
+  document.getElementById('emailCompany').value = l.company;
+  document.getElementById('emailLocs').value = l.locs || '';
+  document.getElementById('emailValue').value = (l.value && l.value !== '-' && l.value !== 'N/A') ? l.value : 'unknown';
+  const reVal = l.re && l.re.toLowerCase().includes('own') ? 'yes' :
+                l.re && (l.re.toLowerCase().includes('unable') || l.re === '-') ? 'no' : 'unknown';
+  document.getElementById('emailRE').value = reVal;
+  // Pre-fill notes with existing outreach data
+  const notes = [l.researchNotes, l.outreachNotes, l.followUpNotes].filter(Boolean).join('\n\n');
+  document.getElementById('emailNotes').value = notes;
+}
+
+async function generateEmail() {
+  const firstName = document.getElementById('emailFirstName').value.trim();
+  const company = document.getElementById('emailCompany').value.trim();
+  const locs = document.getElementById('emailLocs').value.trim();
+  const value = document.getElementById('emailValue').value.trim();
+  const re = document.getElementById('emailRE').value;
+  const outcome = document.getElementById('emailOutcome').value;
+  const notes = document.getElementById('emailNotes').value.trim();
+
+  if (!firstName || !company) {
+    alert('Please fill in at least the lead name and company.');
+    return;
+  }
+
+  document.getElementById('emailPlaceholder').style.display = 'none';
+  document.getElementById('emailContent').classList.remove('visible');
+  document.getElementById('loadingIndicator').classList.add('visible');
+  document.getElementById('copyBtn').classList.remove('visible');
+  document.getElementById('generateBtn').disabled = true;
+
+  const outcomeDescriptions = {
+    'voicemail': 'Kathe left a voicemail but did not speak with the owner.',
+    'no-number': 'Kathe could not reach the owner — no good direct number was available.',
+    'declined': 'The call was screened or declined by an auto-system; Kathe was not able to leave a message.',
+    'connected': 'Kathe connected and had a conversation with the owner or a key contact.',
+    'email-only': 'No call was attempted — this is an email-only outreach.',
+  };
+
+  const reContext = re === 'yes' ? 'The owner is known to own their real estate — include the real estate angle.' :
+                    re === 'no' ? 'Real estate ownership is not confirmed — omit the real estate angle.' :
+                    'Real estate ownership is unknown — mention it briefly and naturally as a possibility.';
+
+  const valueContext = (value && value !== 'unknown' && value !== '-')
+    ? `The estimated business value range for this school is ${value}. IMPORTANT: You MUST include this exact value range in the email verbatim.`
+    : `No specific business value estimate is available. Do NOT invent a number. Instead, reference that HINGE's research team has analyzed schools of similar size, tuition structure, and occupancy levels to determine value ranges, and invite them to receive their personalized estimate through the free valuation.`;
+
+  const prompt = `You are drafting a professional, warm, and personalized follow-up email on behalf of Kathe Petchel, Business Development Specialist at HINGE Early Education Advisors.
+
+ABOUT HINGE: HINGE Early Education Advisors is a nationally recognized childcare business and real estate brokerage firm. They have 22+ years of experience in early education. They have closed more ECE school transactions than any other firm in the nation. They offer a free, no-strings market and growth valuation to multi-site preschool owners. They also run the BOOST nonprofit (supporting ECE teachers in financial crisis) and hold the annual SHIFT Conference.
+
+SENDER INFO:
+- Name: Kathe Petchel
+- Title: Business Development Specialist
+- Email: kpetchel@hingeadvisors.com
+- Phone: (434) 962-2541
+
+LEAD INFO:
+- First name: ${firstName}
+- Company: ${company}
+- Number of locations: ${locs || 'unknown'}
+- ${valueContext}
+- Real estate: ${reContext}
+
+CALL OUTCOME: ${outcomeDescriptions[outcome]}
+
+KATHE'S NOTES FROM RESEARCH AND OUTREACH:
+${notes || 'No additional notes.'}
+
+EMAIL REQUIREMENTS:
+1. The email MUST naturally include these exact phrases (verbatim, no paraphrasing):
+   - "we've been serving Early Education customers nationwide for 22 years"
+   - "we would love to offer you a free market and growth valuation, which will affirm your value numbers"
+   - "if you're not interested in selling at this point, the valuation will also give you key growth information"
+   - "Happy to hop on a 10-minute call to share additional information and answer questions if it makes sense for you."
+   ${value && value !== 'unknown' && value !== '-' ? `- "your business could be worth between ${value}" (use this exact value range)` : ''}
+
+2. If the call outcome is voicemail, email-only, declined, or no-number, include a natural reference near the top explaining the attempted call (e.g. "I just tried to reach you" or "I was unable to get through").
+
+3. If real estate ownership is confirmed, include this phrase: "Also, if you own your real estate, there are opportunities we can provide to assist you in selling or leasing, which typically increases your return."
+
+4. The email should feel personal, not generic. Reference specific details from the notes — the owner's name, their school, any personal connection or context Kathe gathered.
+
+5. Sign off as Kathe Petchel, not Tom Wood.
+
+6. End with these three links on separate lines (include them exactly):
+https://hingeadvisors.com/
+https://www.boostbyhinge.org/
+SHIFT Conference recap: https://youtu.be/yfTrW8psDF0?si=Jk8EOEBPMs_2-gTb
+
+7. Tone: warm, peer-to-peer (Kathe is also a childcare owner), confident, professional. NOT salesy or pushy. The goal is relationship-building, not closing.
+
+8. Length: concise. 3-5 short paragraphs. No fluff.
+
+9. Start with "Subject: [subject line]" on the first line, then a blank line, then the email body.
+
+Write only the email — subject line first, then the body. No commentary, no preamble, no explanation.`;
+
+  try {
+    const resp = await fetch(getApiUrl(), {
+      method: 'POST',
+      headers: getApiHeaders(),
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const text = data.content?.map(c => c.text || '').join('') || 'Error generating email.';
+    document.getElementById('emailContent').textContent = text;
+    document.getElementById('emailContent').classList.add('visible');
+    document.getElementById('copyBtn').classList.add('visible');
+  } catch (e) {
+    document.getElementById('emailContent').textContent = 'Error connecting to Claude API. Please try again.';
+    document.getElementById('emailContent').classList.add('visible');
+  }
+
+  document.getElementById('loadingIndicator').classList.remove('visible');
+  document.getElementById('generateBtn').disabled = false;
+}
+
+function copyEmail() {
+  const text = document.getElementById('emailContent').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('Email copied to clipboard!'));
+}
+
+// ==================== TABS ====================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.tab-btn')[tab === 'pipeline' ? 0 : 1].classList.add('active');
+}
+
+// ==================== TOAST ====================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ==================== VIEW TOGGLE ====================
+let currentView = 'table';
+
+function setView(view) {
+  currentView = view;
+  document.getElementById('tableView').style.display = view === 'table' ? 'block' : 'none';
+  document.getElementById('kanbanView').style.display = view === 'kanban' ? 'block' : 'none';
+  document.getElementById('btnTable').classList.toggle('active', view === 'table');
+  document.getElementById('btnKanban').classList.toggle('active', view === 'kanban');
+  if (view === 'kanban') renderKanban();
+  else renderTable();
+}
+
+function renderKanban() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const stageF = document.getElementById('stageFilter').value;
+
+  const filtered = leads.filter(l => {
+    const txt = `${l.firstName} ${l.lastName} ${l.company} ${l.city} ${l.state}`.toLowerCase();
+    return (!search || txt.includes(search)) && (!stageF || l.stage === stageF);
+  });
+
+  const board = document.getElementById('kanbanBoard');
+  const stagesToShow = stageF ? STAGES.filter(s => s.id === stageF) : STAGES;
+
+  const headerClsMap = {
+    'new': 'kh-new', 'no-answer': 'kh-no-answer', 'voicemail': 'kh-voicemail',
+    'connected': 'kh-connected', 'followup': 'kh-followup', 'valuation': 'kh-valuation',
+    'nurturing': 'kh-nurturing', 'dead': 'kh-dead'
+  };
+
+  board.innerHTML = stagesToShow.map(stage => {
+    const colLeads = filtered.filter(l => l.stage === stage.id);
+    const cards = colLeads.length === 0
+      ? `<div class="kanban-empty">No leads</div>`
+      : colLeads.map(l => {
+          const hasValue = l.value && l.value !== '-' && l.value !== 'N/A';
+          const hasRE = l.re && l.re.toLowerCase().includes('own');
+          return `<div class="kanban-card" onclick="openModal(${l.id})">
+            <div style="position:absolute;top:7px;right:7px;display:flex;gap:4px;opacity:0;transition:opacity 0.15s" class="kanban-hover-btns">
+              <button onclick="event.stopPropagation();openModalTab(${l.id},'edit')" style="background:var(--amber);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Edit</button>
+              <button onclick="event.stopPropagation();openModalTab(${l.id},'research')" style="background:var(--blue);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Prep</button>
+              <button onclick="event.stopPropagation();openEmailForLeadId(${l.id})" style="background:var(--green);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">✉</button>
+            </div>
+            <div class="kanban-card-name">${l.firstName} ${l.lastName}</div>
+            <div class="kanban-card-company">${l.company}</div>
+            <div class="kanban-card-footer">
+              <span class="kanban-card-loc">${l.locs || '?'} loc</span>
+              ${hasValue ? `<span class="kanban-card-value">${l.value}</span>` : ''}
+              ${hasRE ? `<span class="kanban-card-re">✓ RE</span>` : ''}
+            </div>
+          </div>`;
+        }).join('');
+
+    return `<div class="kanban-col">
+      <div class="kanban-col-header ${headerClsMap[stage.id]}">
+        <span>${stage.label}</span>
+        <span class="kanban-col-count">${colLeads.length}</span>
+      </div>
+      <div class="kanban-col-body">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+// ==================== INIT ====================
+initLeads();
+updateStats();
+renderTable();
+populateEmailLeadSelect();
+</script>
+</body>
+</html>
