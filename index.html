@@ -599,6 +599,7 @@
   }
   .toast.show { display: block; animation: fadeInUp 0.2s ease; }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes dropIn { from { opacity: 0.5; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
 
   .empty-state {
     text-align: center;
@@ -690,14 +691,33 @@
     padding: 11px 12px;
     border: 1px solid var(--border);
     box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    cursor: pointer;
-    transition: box-shadow 0.15s, transform 0.1s;
+    cursor: grab;
+    transition: box-shadow 0.15s, transform 0.1s, opacity 0.15s;
     position: relative;
+    user-select: none;
   }
   .kanban-card:hover .kanban-hover-btns { opacity: 1 !important; }
   .kanban-card:hover {
     box-shadow: 0 4px 14px rgba(0,0,0,0.12);
     transform: translateY(-1px);
+  }
+  .kanban-card.dragging {
+    opacity: 0.35;
+    cursor: grabbing;
+    transform: scale(0.97);
+  }
+  .kanban-col-body.drag-over {
+    background: rgba(184,134,11,0.08);
+    border-color: var(--gold);
+    outline: 2px dashed var(--gold);
+    outline-offset: -2px;
+  }
+  .kanban-drop-placeholder {
+    height: 56px;
+    border: 2px dashed var(--gold);
+    border-radius: 8px;
+    background: rgba(184,134,11,0.05);
+    flex-shrink: 0;
   }
   .kanban-card-name {
     font-weight: 600;
@@ -2112,11 +2132,17 @@ function renderKanban() {
   board.innerHTML = stagesToShow.map(stage => {
     const colLeads = filtered.filter(l => l.stage === stage.id);
     const cards = colLeads.length === 0
-      ? `<div class="kanban-empty">No leads</div>`
+      ? `<div class="kanban-empty" data-stage="${stage.id}">No leads</div>`
       : colLeads.map(l => {
           const hasValue = l.value && l.value !== '-' && l.value !== 'N/A';
           const hasRE = l.re && l.re.toLowerCase().includes('own');
-          return `<div class="kanban-card" onclick="openModal(${l.id})">
+          return `<div class="kanban-card"
+              draggable="true"
+              data-id="${l.id}"
+              data-stage="${l.stage}"
+              onclick="handleCardClick(event, ${l.id})"
+              ondragstart="onDragStart(event, ${l.id})"
+              ondragend="onDragEnd(event)">
             <div style="position:absolute;top:7px;right:7px;display:flex;gap:4px;opacity:0;transition:opacity 0.15s" class="kanban-hover-btns">
               <button onclick="event.stopPropagation();openModalTab(${l.id},'edit')" style="background:var(--amber);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Edit</button>
               <button onclick="event.stopPropagation();openModalTab(${l.id},'research')" style="background:var(--blue);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Prep</button>
@@ -2132,14 +2158,123 @@ function renderKanban() {
           </div>`;
         }).join('');
 
-    return `<div class="kanban-col">
+    return `<div class="kanban-col" data-stage="${stage.id}">
       <div class="kanban-col-header ${headerClsMap[stage.id]}">
         <span>${stage.label}</span>
-        <span class="kanban-col-count">${colLeads.length}</span>
+        <span class="kanban-col-count" id="col-count-${stage.id}">${colLeads.length}</span>
       </div>
-      <div class="kanban-col-body">${cards}</div>
+      <div class="kanban-col-body"
+        data-stage="${stage.id}"
+        ondragover="onDragOver(event)"
+        ondragenter="onDragEnter(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event)">${cards}</div>
     </div>`;
   }).join('');
+}
+
+// ==================== DRAG AND DROP ====================
+let draggedId = null;
+let dragMoved = false; // distinguish click vs drag
+
+function handleCardClick(e, id) {
+  if (dragMoved) return; // was a drag, not a click
+  openModal(id);
+}
+
+function onDragStart(e, id) {
+  draggedId = id;
+  dragMoved = false;
+  setTimeout(() => {
+    const card = document.querySelector(`.kanban-card[data-id="${id}"]`);
+    if (card) card.classList.add('dragging');
+  }, 0);
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', id);
+}
+
+function onDragEnd(e) {
+  dragMoved = true;
+  document.querySelectorAll('.kanban-card.dragging').forEach(c => c.classList.remove('dragging'));
+  document.querySelectorAll('.kanban-col-body.drag-over').forEach(c => c.classList.remove('drag-over'));
+  document.querySelectorAll('.kanban-drop-placeholder').forEach(p => p.remove());
+  // Reset dragMoved after a tick so click handler can check it
+  setTimeout(() => { dragMoved = false; }, 50);
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function onDragEnter(e) {
+  e.preventDefault();
+  const col = e.currentTarget;
+  col.classList.add('drag-over');
+  // Add placeholder if not already there
+  if (!col.querySelector('.kanban-drop-placeholder')) {
+    const ph = document.createElement('div');
+    ph.className = 'kanban-drop-placeholder';
+    col.appendChild(ph);
+  }
+}
+
+function onDragLeave(e) {
+  // Only remove if leaving the column body itself (not a child)
+  const col = e.currentTarget;
+  if (!col.contains(e.relatedTarget)) {
+    col.classList.remove('drag-over');
+    col.querySelectorAll('.kanban-drop-placeholder').forEach(p => p.remove());
+  }
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const col = e.currentTarget;
+  const newStage = col.dataset.stage;
+  col.classList.remove('drag-over');
+  col.querySelectorAll('.kanban-drop-placeholder').forEach(p => p.remove());
+
+  if (draggedId === null || !newStage) return;
+
+  const lead = leads.find(l => l.id === draggedId);
+  if (!lead || lead.stage === newStage) return;
+
+  const oldStage = lead.stage;
+  lead.stage = newStage;
+  saveLeads();
+  updateStats();
+  showToast(`${lead.firstName} moved to ${STAGES.find(s => s.id === newStage)?.label}`);
+
+  // Smooth DOM update — move card without full re-render
+  const card = document.querySelector(`.kanban-card[data-id="${draggedId}"]`);
+  if (card) {
+    card.dataset.stage = newStage;
+    col.appendChild(card);
+    card.style.animation = 'none';
+    card.offsetHeight; // force reflow
+    card.style.animation = 'dropIn 0.2s ease';
+  }
+
+  // Remove empty placeholder from old col if it had one, update counts
+  const oldCol = document.querySelector(`.kanban-col-body[data-stage="${oldStage}"]`);
+  if (oldCol) {
+    const remaining = oldCol.querySelectorAll('.kanban-card').length;
+    if (remaining === 0) {
+      oldCol.innerHTML = `<div class="kanban-empty" data-stage="${oldStage}">No leads</div>`;
+    }
+    const oldCount = document.getElementById(`col-count-${oldStage}`);
+    if (oldCount) oldCount.textContent = remaining;
+  }
+  const newCount = document.getElementById(`col-count-${newStage}`);
+  if (newCount) {
+    const newRemaining = col.querySelectorAll('.kanban-card').length;
+    newCount.textContent = newRemaining;
+    // Remove "No leads" placeholder if present
+    col.querySelectorAll('.kanban-empty').forEach(e => e.remove());
+  }
+
+  draggedId = null;
 }
 
 // ==================== INIT ====================
