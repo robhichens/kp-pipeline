@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KP Pipeline — Overview</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy:   #1a1a2e;
+  --orange: #FF6B35;
+  --teal:   #4ECDC4;
+  --cream:  #F5F0E8;
+  --purple: #9B59B6;
+  --white:  #ffffff;
+  --text:   #333;
+  --muted:  #777;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.infographic { max-width: 100%; background: transparent; }
+
+/* ── HERO ─────────────────────────────── */
+.header {
+  background: var(--navy);
+  padding: 76px 56px 72px;
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -90px; right: -90px;
+  width: 400px; height: 400px;
+  background: var(--orange);
+  border-radius: 50%;
+  opacity: 0.1;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -110px; right: 16%;
+  width: 260px; height: 260px;
+  background: var(--teal);
+  border-radius: 50%;
+  opacity: 0.09;
+}
+.header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 66px;
+  font-weight: 800;
+  color: white;
+  line-height: 1.08;
+  max-width: 580px;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 1;
+}
+.header p {
+  font-size: 18px;
+  color: rgba(255,255,255,0.72);
+  max-width: 500px;
+  font-weight: 400;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── SECTION BASE ─────────────────────── */
+.section { padding: 76px 56px; }
+.section.on-cream { background: var(--cream); }
+.section.on-white { background: var(--white); }
+.section.on-navy  { background: var(--navy);  }
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 10px;
+  padding: 4px 10px;
+  background: rgba(255,107,53,0.1);
+  border-radius: 4px;
+}
+.section.on-navy .eyebrow {
+  color: var(--teal);
+  background: rgba(78,205,196,0.12);
+}
+
+.section-title {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--navy);
+  margin-bottom: 44px;
+  max-width: 640px;
+}
+.section.on-navy .section-title { color: white; }
+
+/* ── FEATURE CARDS ────────────────────── */
+.features-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--white);
+  border-radius: 22px;
+  padding: 38px 34px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 44px rgba(0,0,0,0.12);
+}
+.feature-card.blue   { border-left: 5px solid var(--orange); }
+.feature-card.orange { border-left: 5px solid var(--teal);   }
+.feature-card.purple { border-left: 5px solid var(--navy);   }
+.feature-card.teal   { border-left: 5px solid var(--purple); }
+
+.feature-number {
+  font-size: 100px;
+  font-weight: 900;
+  position: absolute;
+  bottom: -12px; right: 16px;
+  opacity: 0.04;
+  color: var(--navy);
+  line-height: 1;
+  user-select: none;
+  pointer-events: none;
+}
+
+.feature-icon {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.feature-icon svg {
+  width: 26px; height: 26px;
+  fill: none;
+  stroke: white;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.feature-card.blue   .feature-icon { background: var(--orange); }
+.feature-card.orange .feature-icon { background: var(--teal);   }
+.feature-card.purple .feature-icon { background: var(--navy);   }
+.feature-card.teal   .feature-icon { background: var(--purple); }
+
+.feature-card h2 { font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+.feature-card p  { font-size: 15px; color: #555; line-height: 1.65; }
+
+.feature-list { list-style: none; margin-top: 18px; }
+.feature-list li {
+  font-size: 14px; color: #666;
+  padding: 6px 0 6px 22px;
+  position: relative;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.feature-list li:last-child { border-bottom: none; }
+.feature-list li::before {
+  content: '✓'; position: absolute; left: 0; top: 6px;
+  font-size: 11px; font-weight: 800; color: var(--orange);
+}
+
+/* ── BENEFITS / STATS ─────────────────── */
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.benefit-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  padding: 34px 20px;
+  text-align: center;
+  transition: background 0.2s;
+}
+.benefit-box.alt-bg { background: rgba(255,255,255,0.04); }
+.benefit-box:hover  { background: rgba(255,255,255,0.1); }
+
+.benefit-icon {
+  font-size: 64px; font-weight: 900;
+  color: var(--orange); line-height: 1;
+  margin-bottom: 12px; display: block;
+  font-family: 'Inter', sans-serif;
+}
+.benefit-icon.svg-icon {
+  font-size: 0; width: 62px; height: 62px;
+  background: rgba(255,107,53,0.14);
+  border-radius: 16px; display: flex;
+  align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+}
+.benefit-icon.svg-icon svg {
+  width: 28px; height: 28px;
+  stroke: var(--orange); fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+}
+.benefit-box h3 {
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.88); margin-bottom: 6px;
+}
+.benefit-box p { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
+
+/* ── TIMELINE ─────────────────────────── */
+.timeline {
+  background: var(--white); border-radius: 22px;
+  padding: 40px 48px; box-shadow: 0 4px 28px rgba(0,0,0,0.07);
+}
+.timeline h3 {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.16em; color: var(--muted); margin-bottom: 36px;
+}
+.timeline-items {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  position: relative;
+}
+.timeline-items::before {
+  content: ''; position: absolute;
+  top: 22px; left: 12.5%; right: 12.5%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--orange), var(--teal));
+  z-index: 0;
+}
+.timeline-item { text-align: center; position: relative; z-index: 1; padding: 0 14px; }
+
+.timeline-step-num {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy); color: white;
+  font-size: 18px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; position: relative; z-index: 2;
+}
+.timeline-item.step-2 .timeline-step-num { background: var(--orange); }
+.timeline-item.step-3 .timeline-step-num { background: var(--teal); color: var(--navy); }
+.timeline-item.step-4 .timeline-step-num { background: var(--purple); }
+
+.timeline-text { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.45; }
+
+/* ── COLOR SWATCHES ───────────────────── */
+.color-palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.color-swatch {
+  border-radius: 18px; padding: 30px 16px 22px;
+  text-align: center; color: white; font-weight: 600;
+  font-size: 14px; line-height: 1.4;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+}
+.color-swatch span { display: block; font-size: 12px; opacity: 0.75; font-weight: 400; margin-top: 4px; }
+.color-swatch.blue   { background: #2E75B6; }
+.color-swatch.orange { background: #FF9800; }
+.color-swatch.purple { background: #9C27B0; }
+.color-swatch.teal   { background: #00BCD4; }
+.color-swatch.green  { background: #1a5c3a; }
+
+/* ── WAVE DIVIDER ─────────────────────── */
+.wave-divider { display: block; width: 100%; overflow: hidden; line-height: 0; margin-bottom: -2px; background: var(--white); }
+.wave-divider svg { display: block; width: 100%; height: 80px; }
+
+/* ── CTA ──────────────────────────────── */
+.cta-section {
+  background: var(--navy); padding: 80px 56px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: ''; position: absolute; top: -120px; left: -80px;
+  width: 420px; height: 420px; background: var(--orange);
+  border-radius: 50%; opacity: 0.07;
+}
+.cta-section::after {
+  content: ''; position: absolute; bottom: -100px; right: -60px;
+  width: 320px; height: 320px; background: var(--teal);
+  border-radius: 50%; opacity: 0.08;
+}
+.cta-section h2 {
+  font-family: 'Playfair Display', serif; font-size: 52px;
+  font-weight: 700; color: white; margin-bottom: 16px;
+  position: relative; z-index: 1;
+}
+.cta-section p { font-size: 17px; color: rgba(255,255,255,0.72); margin-bottom: 36px; position: relative; z-index: 1; }
+
+.btn {
+  display: inline-block; background: var(--orange); color: white;
+  padding: 16px 44px; border-radius: 50px; font-weight: 700;
+  font-size: 16px; letter-spacing: 0.02em; border: none; cursor: pointer;
+  box-shadow: 0 8px 28px rgba(255,107,53,0.45);
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative; z-index: 1; font-family: 'Inter', sans-serif;
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(255,107,53,0.55); }
+
+/* ── RESPONSIVE ───────────────────────── */
+@media (max-width: 900px) {
+  .header { padding: 52px 28px 48px; }
+  .header h1 { font-size: 44px; }
+  .section { padding: 56px 28px; }
+  .section-title { font-size: 34px; margin-bottom: 32px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+  .color-palette { grid-template-columns: repeat(3, 1fr); }
+  .timeline-items { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  .timeline-items::before { display: none; }
+  .cta-section { padding: 60px 28px; }
+  .cta-section h2 { font-size: 38px; }
+}
+@media (max-width: 560px) {
+  .header h1 { font-size: 34px; }
+  .section-title { font-size: 28px; }
+  .benefits-grid { grid-template-columns: 1fr; }
+  .timeline-items { grid-template-columns: 1fr; }
+  .color-palette { grid-template-columns: repeat(2, 1fr); }
+  .cta-section h2 { font-size: 30px; }
+}
+</style>
+</head>
+<body>
+
+<div class="infographic">
+
+  <div class="header">
+    <h1>🚀 KP Pipeline</h1>
+    <p>Your Personal Lead Management System for Cold-Call Success</p>
+  </div>
+
+  <div class="section on-cream">
+    <div class="eyebrow">What it does</div>
+    <h2 class="section-title">Core Features</h2>
+    <div class="features-grid">
+
+      <div class="feature-card blue">
+        <div class="feature-number">1</div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+        </div>
+        <h2>Pipeline Management</h2>
+        <p>Track all leads through 8 pipeline stages with table and drag-&-drop kanban views</p>
+        <ul class="feature-list">
+          <li>Sortable columns</li>
+          <li>Real-time search</li>
+          <li>Live stats bar</li>
+        </ul>
+      </div>
+
+      <div class="feature-card orange">
+        <div class="feature-number">2</div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 21h6M12 3a6 6 0 0 1 6 6c0 2.22-1.21 4.16-3 5.2V17a1 1 0 0 1-1 1H10a1 1 0 0 1-1-1v-2.8C7.21 13.16 6 11.22 6 9a6 6 0 0 1 6-6z"/><line x1="8" y1="21" x2="16" y2="21"/></svg>
+        </div>
+        <h2>AI Call Prep</h2>
+        <p>Generate intelligent research briefings tailored to each lead's state</p>
+        <ul class="feature-list">
+          <li>Market intelligence</li>
+          <li>State licensing info</li>
+          <li>Conversation openers</li>
+        </ul>
+      </div>
+
+      <div class="feature-card purple">
+        <div class="feature-number">3</div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        </div>
+        <h2>Email Generator</h2>
+        <p>Draft personalized follow-ups using HINGE's required messaging</p>
+        <ul class="feature-list">
+          <li>Call context aware</li>
+          <li>Branded signature</li>
+          <li>One-click copy</li>
+        </ul>
+      </div>
+
+      <div class="feature-card teal">
+        <div class="feature-number">4</div>
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5.25 3.75 10.15 9 11.29C18.25 23.15 21 18.25 21 13V7L12 2z"/></svg>
+        </div>
+        <h2>Private & Secure</h2>
+        <p>All data stored in your browser. No login, no cloud, no account.</p>
+        <ul class="feature-list">
+          <li>Zero login required</li>
+          <li>Browser-based storage</li>
+          <li>Your data stays yours</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section on-navy">
+    <div class="eyebrow">Everything included</div>
+    <h2 class="section-title">What You Get</h2>
+    <div class="benefits-grid">
+
+      <div class="benefit-box">
+        <span class="benefit-icon">62</span>
+        <h3>Pre-loaded Leads</h3>
+        <p>All 62 leads from your list ready to go</p>
+      </div>
+
+      <div class="benefit-box alt-bg">
+        <span class="benefit-icon">8</span>
+        <h3>Pipeline Stages</h3>
+        <p>New → Valuation Triggered → Not Viable</p>
+      </div>
+
+      <div class="benefit-box">
+        <div class="benefit-icon svg-icon">
+          <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </div>
+        <h3>Smart Filtering</h3>
+        <p>Search by name, company, city, or stage</p>
+      </div>
+
+      <div class="benefit-box alt-bg">
+        <div class="benefit-icon svg-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+        </div>
+        <h3>Email Log</h3>
+        <p>Full history of all generated emails per lead</p>
+      </div>
+
+      <div class="benefit-box">
+        <div class="benefit-icon svg-icon">
+          <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        </div>
+        <h3>Print Support</h3>
+        <p>Export lead sheets and call prep notes</p>
+      </div>
+
+      <div class="benefit-box alt-bg">
+        <div class="benefit-icon svg-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3>Real-time Stats</h3>
+        <p>Track Connected, Need Action, and more</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section on-cream">
+    <div class="eyebrow">Quick start</div>
+    <h2 class="section-title">Getting Started (2 Minutes)</h2>
+    <div class="timeline">
+      <h3>Quick Setup Flow</h3>
+      <div class="timeline-items">
+        <div class="timeline-item">
+          <div class="timeline-step-num">1</div>
+          <div class="timeline-text">Open <strong>kppipeline.netlify.app</strong></div>
+        </div>
+        <div class="timeline-item step-2">
+          <div class="timeline-step-num">2</div>
+          <div class="timeline-text">View all 62 leads in Pipeline tab</div>
+        </div>
+        <div class="timeline-item step-3">
+          <div class="timeline-step-num">3</div>
+          <div class="timeline-text">Click any lead for Overview, Research, Email Log</div>
+        </div>
+        <div class="timeline-item step-4">
+          <div class="timeline-step-num">4</div>
+          <div class="timeline-text">Use @ Email Generator to draft follow-ups</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section on-white">
+    <div class="eyebrow">Brand identity</div>
+    <h2 class="section-title">Visual Design & Brand</h2>
+    <div class="color-palette">
+      <div class="color-swatch blue">Primary Blue<br/><span>#2E75B6</span></div>
+      <div class="color-swatch orange">Success Orange<br/><span>#FF9800</span></div>
+      <div class="color-swatch purple">Accent Purple<br/><span>#9C27B0</span></div>
+      <div class="color-swatch teal">Secondary Teal<br/><span>#00BCD4</span></div>
+      <div class="color-swatch green">Trust Green<br/><span>#1a5c3a</span></div>
+    </div>
+  </div>
+
+  <div class="wave-divider" style="background: var(--white);">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,20 C240,70 480,0 720,40 C960,80 1200,10 1440,50 L1440,80 L0,80 Z" fill="#1a1a2e"/>
+    </svg>
+  </div>
+
+  <div class="cta-section">
+    <h2>Ready to Start?</h2>
+    <p>Visit <strong>https://kppipeline.netlify.app</strong> now and begin tracking your pipeline</p>
+    <button class="btn" onclick="window.open('https://kppipeline.netlify.app', '_blank')">Launch KP Pipeline →</button>
+  </div>
+
+</div>
+
+</body>
+</html>
