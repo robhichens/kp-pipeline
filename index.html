@@ -2471,7 +2471,8 @@ Generate a CALL PREP SHEET with market intelligence for ${locationDesc} across t
 1. BUSINESS & ECONOMIC CLIMATE — employer growth, major industries, economy health
 2. CHILDCARE REAL ESTATE MARKET — commercial property trends, childcare facility demand
 3. PRESCHOOL & ECE MARKET — competition landscape, ${state} licensing/regulatory environment, enrollment trends, tuition benchmarks
-4. DEMOGRAPHICS & FAMILY TRENDS — birth rates, household income, population growth, family formation
+4. ${state} LICENSED STAFF-TO-CHILD RATIOS — the exact state-mandated ratios per age group (infants, young toddlers, toddlers, preschool, school-age). Present as a simple list: Age Group → Ratio → Max Group Size. If any ratio is uncertain, note it as "verify with state licensing office."
+5. DEMOGRAPHICS & FAMILY TRENDS — birth rates, household income, population growth, family formation
 
 CRITICAL: You MUST return ONLY the HTML block below, fully filled in. No questions. No preamble. No markdown. No code fences. Even if data is limited, make your best effort using ${state} state-level knowledge.
 
@@ -2497,6 +2498,15 @@ CRITICAL: You MUST return ONLY the HTML block below, fully filled in. No questio
     <div class="prep-section-title">🏫 Preschool & ECE Market — ${state}</div>
     <ul class="prep-bullets">
       <li>[2-3 bullets: competition, licensing, enrollment trends, tuition benchmarks]</li>
+    </ul>
+
+    <div class="prep-section-title">📋 ${state} Licensed Staff-to-Child Ratios</div>
+    <ul class="prep-bullets">
+      <li><strong>Infants (0–12 mo):</strong> [ratio] — max group size [n]</li>
+      <li><strong>Young Toddlers (12–24 mo):</strong> [ratio] — max group size [n]</li>
+      <li><strong>Toddlers (2 yr):</strong> [ratio] — max group size [n]</li>
+      <li><strong>Preschool (3–5 yr):</strong> [ratio] — max group size [n]</li>
+      <li><strong>School-Age (5+ yr):</strong> [ratio] — max group size [n]</li>
     </ul>
 
     <div class="prep-section-title">👶 Demographics & Family Trends</div>
