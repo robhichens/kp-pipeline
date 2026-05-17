@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>HINGE Advisors — Lead Pipeline</title>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -772,7 +771,7 @@
   .row-count { font-size: 14px; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
 
   /* KANBAN */
-  .kanban-container { padding: 24px 28px 36px; overflow-x: auto; }
+  .kanban-container { padding: 24px 28px 36px; overflow-x: auto; width: 100%; }
   .kanban-board { display: flex; gap: 16px; align-items: flex-start; min-width: max-content; }
   .kanban-col { width: 240px; flex-shrink: 0; display: flex; flex-direction: column; }
   .kanban-col-header {
@@ -815,7 +814,6 @@
     position: relative;
     user-select: none;
   }
-  .kanban-card:hover .kanban-hover-btns { opacity: 1 !important; }
   .kanban-card:hover {
     box-shadow: 0 6px 20px rgba(0,0,0,0.13);
     transform: translateY(-2px);
@@ -867,7 +865,6 @@
     border: 1px solid #d4b060;
   }
   .kanban-card-re { color: var(--green); font-size: 12px; font-weight: 800; }
-  .kanban-card:hover .kanban-hover-btns { opacity: 1 !important; }
 
   /* KANBAN COLUMN HEADER COLORS — high contrast */
   .kh-new { background: #d0e4f5; color: #0f2d4a; border: 1px solid #a8c8e8; }
@@ -1499,6 +1496,7 @@
             <th>RE</th>
             <th onclick="sortBy('stage')">Stage ↕</th>
             <th>Next Steps</th>
+            <th onclick="sortBy('lastAction')" style="white-space:nowrap">Last Action ↕</th>
           </tr>
         </thead>
         <tbody id="leadsTableBody"></tbody>
@@ -1624,6 +1622,7 @@
         <label>Pipeline Stage:</label>
         <select class="stage-select" id="modalStageSelect" onchange="updateStage()"></select>
         <span id="stageSavedMsg" class="saved-msg">✓ Saved</span>
+        <span id="lastActionDisplay" style="margin-left:auto;font-size:12px;color:var(--muted);font-style:italic"></span>
       </div>
       <div class="modal-grid" id="modalGrid"></div>
       <div class="modal-section-title">Research Notes</div>
@@ -1904,11 +1903,6 @@
   </div>
 </div>
 
-<!-- VALUATION TRIGGERED MEME OVERLAY -->
-<div id="memeOverlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;flex-direction:column;gap:16px">
-  <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#ffd700;text-shadow:0 0 20px rgba(255,215,0,0.8);letter-spacing:0.04em">🎉 Valuation Triggered! 🎉</div>
-  <video id="memeVideo" src="assests/grok-video-2d8cfa9f-2fc9-4622-afd6-4ff8eacb9062.mp4" autoplay playsinline muted style="max-width:70vw;max-height:65vh;border-radius:16px;box-shadow:0 0 60px rgba(139,0,255,0.7),0 0 120px rgba(255,215,0,0.4)"></video>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1962,6 +1956,9 @@ function initLeads() {
   const stored = localStorage.getItem('hingeLeads_v2');
   if (stored) {
     leads = JSON.parse(stored);
+    const today = new Date().toISOString();
+    leads.forEach(l => { if (!l.lastActionAt) l.lastActionAt = today; });
+    saveLeads();
   } else {
     leads = RAW_LEADS
       .filter(r => r['First Name'] && r['First Name'].trim())
@@ -1989,6 +1986,7 @@ function initLeads() {
         listDate: r['Lead List Date'] || '',
         addedNotes: [],
         stage: inferStage(r),
+        lastActionAt: new Date().toISOString(),
       }));
     saveLeads();
   }
@@ -1996,6 +1994,23 @@ function initLeads() {
 
 function saveLeads() {
   localStorage.setItem('hingeLeads_v2', JSON.stringify(leads));
+}
+
+function touchLead(lead) {
+  lead.lastActionAt = new Date().toISOString();
+}
+
+function daysSince(isoString) {
+  if (!isoString) return null;
+  const diff = Date.now() - new Date(isoString).getTime();
+  return Math.floor(diff / 86400000);
+}
+
+function formatDaysAgo(isoString) {
+  const d = daysSince(isoString);
+  if (d === null) return '—';
+  if (d === 0) return 'today';
+  return d + 'd';
 }
 
 // ==================== STATS ====================
@@ -2038,6 +2053,7 @@ function renderTable() {
     else if (sortKey === 'locs') { va = parseInt(a.locs)||0; vb = parseInt(b.locs)||0; }
     else if (sortKey === 'value') { va = a.value; vb = b.value; }
     else if (sortKey === 'stage') { va = a.stage; vb = b.stage; }
+    else if (sortKey === 'lastAction') { va = a.lastActionAt || ''; vb = b.lastActionAt || ''; }
     if (va < vb) return -sortDir;
     if (va > vb) return sortDir;
     return 0;
@@ -2083,6 +2099,7 @@ function renderTable() {
       <td>${hasRE ? '<span class="re-owned">✓ RE</span>' : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
       <td><span class="badge ${cls}"><span class="badge-dot"></span>${stageLabel}</span></td>
       <td>${hasNextStep ? `<span class="next-step-tag" title="${l.nextSteps}">${l.nextSteps}</span>` : '<span style="color:#ccc;font-size:12px">—</span>'}</td>
+      <td style="text-align:center;font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap">${formatDaysAgo(l.lastActionAt)}</td>
     </tr>`;
   }).join('');
 }
@@ -2192,6 +2209,8 @@ function openModal(id) {
   document.getElementById('modalOtherNotes').textContent = l.otherNotes || '—';
   document.getElementById('newNoteInput').value = '';
   document.getElementById('stageSavedMsg').style.display = 'none';
+  const ago = formatDaysAgo(l.lastActionAt);
+  document.getElementById('lastActionDisplay').textContent = ago === 'today' ? 'Last action: today' : `Last action: ${ago} ago`;
   document.getElementById('noteSavedMsg').style.display = 'none';
 
   // reset to overview tab
@@ -2222,10 +2241,11 @@ function updateStage() {
   const l = leads.find(x => x.id === currentLeadIdx);
   const newStage = document.getElementById('modalStageSelect').value;
   l.stage = newStage;
+  touchLead(l);
   saveLeads();
+  document.getElementById('lastActionDisplay').textContent = 'Last action: today';
   document.getElementById('stageSavedMsg').style.display = 'inline';
   setTimeout(() => document.getElementById('stageSavedMsg').style.display = 'none', 2000);
-  if (newStage === 'val-triggered') triggerValuationCelebration();
 }
 
 function saveNote() {
@@ -2236,6 +2256,7 @@ function saveNote() {
   const now = new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
   if (!l.addedNotes) l.addedNotes = [];
   l.addedNotes.push({ date: now, text });
+  touchLead(l);
   saveLeads();
   document.getElementById('newNoteInput').value = '';
   document.getElementById('noteSavedMsg').style.display = 'block';
@@ -2302,6 +2323,7 @@ function saveEdit() {
   l.outreachNotes = document.getElementById('ef-outreachNotes').value.trim();
   l.followUpNotes = document.getElementById('ef-followUpNotes').value.trim();
   l.otherNotes = document.getElementById('ef-otherNotes').value.trim();
+  touchLead(l);
   saveLeads();
   // Update header
   document.getElementById('modalName').textContent = `${l.firstName} ${l.lastName}`;
@@ -2743,6 +2765,7 @@ Start with "Subject: [subject line]" then a blank line then the email. Write onl
           subject: subjectMatch ? subjectMatch[1].trim() : '',
           text
         });
+        touchLead(logLead);
         saveLeads();
         showToast('Email generated & saved to log!');
       }
@@ -2822,11 +2845,7 @@ function renderKanban() {
               onclick="handleCardClick(event, ${l.id})"
               ondragstart="onDragStart(event, ${l.id})"
               ondragend="onDragEnd(event)">
-            <div style="position:absolute;top:7px;right:7px;display:flex;gap:4px;opacity:0;transition:opacity 0.15s" class="kanban-hover-btns">
-              <button onclick="event.stopPropagation();openModalTab(${l.id},'edit')" style="background:var(--amber);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Edit</button>
-              <button onclick="event.stopPropagation();openModalTab(${l.id},'research')" style="background:var(--blue);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Prep</button>
-              <button onclick="event.stopPropagation();openEmailForLeadId(${l.id})" style="background:var(--green);color:white;border:none;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">✉</button>
-            </div>
+            <div style="position:absolute;top:6px;right:7px;font-size:10px;font-weight:600;color:var(--muted);opacity:0.75">${formatDaysAgo(l.lastActionAt)}</div>
             <div class="kanban-card-name">${l.firstName} ${l.lastName}</div>
             <div class="kanban-card-company">${l.company}</div>
             <div class="kanban-card-footer">
@@ -2921,11 +2940,10 @@ function onDrop(e) {
 
   const oldStage = lead.stage;
   lead.stage = newStage;
+  touchLead(lead);
   saveLeads();
   updateStats();
   showToast(`${lead.firstName} moved to ${STAGES.find(s => s.id === newStage)?.label}`);
-  if (newStage === 'val-triggered') triggerValuationCelebration();
-
   // Smooth DOM update — move card without full re-render
   const card = document.querySelector(`.kanban-card[data-id="${draggedId}"]`);
   if (card) {
@@ -3031,38 +3049,6 @@ function printLead() {
   setTimeout(() => root.remove(), 1000);
 }
 
-// ==================== VALUATION CELEBRATION ====================
-function triggerValuationCelebration() {
-  const colors = ['#ffd700','#ff69b4','#8b00ff','#00ff88','#ff4500','#b8860b','#cc44ff'];
-
-  // Big central burst
-  confetti({ particleCount: 180, spread: 120, origin: { y: 0.5 }, colors, startVelocity: 50 });
-
-  // Side cannons after a beat
-  setTimeout(() => {
-    confetti({ particleCount: 100, angle: 60, spread: 80, origin: { x: 0, y: 0.65 }, colors });
-    confetti({ particleCount: 100, angle: 120, spread: 80, origin: { x: 1, y: 0.65 }, colors });
-  }, 350);
-
-  // Glitter shower
-  setTimeout(() => {
-    confetti({ particleCount: 60, spread: 60, origin: { y: 0.3 }, colors, gravity: 0.5, scalar: 0.7 });
-  }, 800);
-
-  // Show meme
-  const overlay = document.getElementById('memeOverlay');
-  const video = document.getElementById('memeVideo');
-  overlay.style.display = 'flex';
-  video.currentTime = 0;
-  video.play().catch(() => {});
-
-  setTimeout(() => {
-    overlay.style.display = 'none';
-    video.pause();
-    video.currentTime = 0;
-  }, 4000);
-}
-
 // ==================== ADD LEAD ====================
 function openAddLeadModal() {
   ['firstName','lastName','company','email','phone','city','state','locs','value','website','notes'].forEach(f => {
@@ -3116,6 +3102,7 @@ function saveNewLead() {
     listDate: new Date().toLocaleDateString('en-US'),
     addedNotes: [],
     stage: document.getElementById('al-stage').value,
+    lastActionAt: new Date().toISOString(),
   });
   saveLeads();
   updateStats();
@@ -3314,6 +3301,7 @@ function executeImport() {
       listDate: get('listDate'),
       addedNotes: [],
       stage: 'new',
+      lastActionAt: new Date().toISOString(),
     });
     if (email) existingEmails.add(email);
     imported++;
