@@ -1532,7 +1532,7 @@
     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
     Sign in with Google
   </button>
-  <div class="signin-note">Access restricted — authorized users only</div>
+  <div class="signin-note" id="signInNote">Access restricted — authorized users only</div>
 </div>
 
 <header>
@@ -3474,10 +3474,20 @@ function doSignOut() {
   auth.signOut();
 }
 
+const ALLOWED_EMAILS = [
+  'kpetchel@gmail.com',
+  'robhichens84@gmail.com',
+];
+
 auth.onAuthStateChanged(user => {
   const overlay = document.getElementById('signInOverlay');
   const userMenu = document.getElementById('userMenu');
   if (user) {
+    if (!ALLOWED_EMAILS.includes(user.email.toLowerCase())) {
+      auth.signOut();
+      document.getElementById('signInNote').textContent = 'Access denied — this account is not authorized.';
+      return;
+    }
     overlay.style.display = 'none';
     document.getElementById('userPhoto').src = user.photoURL || '';
     document.getElementById('userName').textContent = user.displayName || user.email;
