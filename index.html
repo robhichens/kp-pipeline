@@ -1429,9 +1429,111 @@
     white-space: pre-wrap;
     font-family: var(--font);
   }
+  /* SIGN-IN OVERLAY */
+  #signInOverlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+  .signin-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--gold-light);
+    text-align: center;
+  }
+  .signin-subtitle {
+    font-size: 14px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    text-align: center;
+    margin-top: -16px;
+  }
+  .signin-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px 28px;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: background 0.15s;
+    min-height: 52px;
+  }
+  .signin-btn:hover { background: #f0f0f0; }
+  .signin-btn img { width: 22px; height: 22px; }
+  .signin-note { font-size: 12px; color: #555; text-align: center; }
+
+  /* USER MENU */
+  .user-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 16px;
+  }
+  .user-photo {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--gold-light);
+    object-fit: cover;
+    background: #333;
+  }
+  .user-name {
+    font-size: 13px;
+    color: #ccc;
+    font-weight: 500;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .signout-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #aaa;
+    font-family: var(--font);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .signout-btn:hover { background: rgba(255,255,255,0.18); color: white; }
 </style>
+
+<!-- Firebase compat SDK v10 -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+<!-- SIGN-IN OVERLAY -->
+<div id="signInOverlay">
+  <div>
+    <div class="signin-logo">HINGE Advisors</div>
+    <div class="signin-subtitle">Lead Pipeline — Kathe Petchel</div>
+  </div>
+  <button class="signin-btn" onclick="signInWithGoogle()">
+    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+    Sign in with Google
+  </button>
+  <div class="signin-note">Access restricted — authorized users only</div>
+</div>
 
 <header>
   <div class="header-brand">
@@ -1445,6 +1547,11 @@
     <button class="tab-btn active" onclick="switchTab('pipeline')">$ Pipeline</button>
     <button class="tab-btn tab-btn-email" onclick="switchTab('email')">@ Email Generator</button>
   </nav>
+  <div class="user-menu" id="userMenu" style="display:none">
+    <img class="user-photo" id="userPhoto" src="" alt="">
+    <span class="user-name" id="userName"></span>
+    <button class="signout-btn" onclick="doSignOut()">Sign Out</button>
+  </div>
 </header>
 <!-- STATS BAR -->
 <div class="stats-bar" id="statsBar">
@@ -1952,48 +2059,55 @@ function inferStage(lead) {
   return 'voicemail';
 }
 
-function initLeads() {
-  const stored = localStorage.getItem('hingeLeads_v2');
-  if (stored) {
-    leads = JSON.parse(stored);
-    const today = new Date().toISOString();
-    leads.forEach(l => { if (!l.lastActionAt) l.lastActionAt = today; });
-    saveLeads();
-  } else {
-    leads = RAW_LEADS
-      .filter(r => r['First Name'] && r['First Name'].trim())
-      .map((r, i) => ({
-        id: i,
-        firstName: r['First Name'].trim(),
-        lastName: r['Last Name'].trim(),
-        title: r['Title'] || '',
-        company: r['Company Name'].trim(),
-        email: r['Email'].trim(),
-        altEmail: r['Alternate Email'] || '',
-        phone: r['Phone #'] || '',
-        city: r['City'] || '',
-        state: r['State'] || '',
-        locs: r['# of Loc'] || '',
-        capacity: r['Licensed Capacities'] || '',
-        re: r['RE'] || '',
-        website: r['Website'] || '',
-        value: r['Business Value'] || '-',
-        researchNotes: r['Kim/Research Notes'] || '',
-        otherNotes: r['OtherNotes'] || '',
-        outreachNotes: r['Outreach Notes'] || '',
-        followUpNotes: r['Outreach Follow-Up Notes'] || '',
-        nextSteps: r['NEXT STEPS'] || '',
-        listDate: r['Lead List Date'] || '',
-        addedNotes: [],
-        stage: inferStage(r),
-        lastActionAt: new Date().toISOString(),
-      }));
-    saveLeads();
+function buildLeadsFromRaw() {
+  return RAW_LEADS
+    .filter(r => r['First Name'] && r['First Name'].trim())
+    .map((r, i) => ({
+      id: i,
+      firstName: r['First Name'].trim(),
+      lastName: r['Last Name'].trim(),
+      title: r['Title'] || '',
+      company: r['Company Name'].trim(),
+      email: r['Email'].trim(),
+      altEmail: r['Alternate Email'] || '',
+      phone: r['Phone #'] || '',
+      city: r['City'] || '',
+      state: r['State'] || '',
+      locs: r['# of Loc'] || '',
+      capacity: r['Licensed Capacities'] || '',
+      re: r['RE'] || '',
+      website: r['Website'] || '',
+      value: r['Business Value'] || '-',
+      researchNotes: r['Kim/Research Notes'] || '',
+      otherNotes: r['OtherNotes'] || '',
+      outreachNotes: r['Outreach Notes'] || '',
+      followUpNotes: r['Outreach Follow-Up Notes'] || '',
+      nextSteps: r['NEXT STEPS'] || '',
+      listDate: r['Lead List Date'] || '',
+      addedNotes: [],
+      stage: inferStage(r),
+      lastActionAt: new Date().toISOString(),
+    }));
+}
+
+async function saveLeads() {
+  try {
+    const batch = db.batch();
+    leads.forEach(lead => {
+      batch.set(db.collection('leads').doc(String(lead.id)), lead);
+    });
+    await batch.commit();
+  } catch(e) {
+    console.error('saveLeads error:', e);
   }
 }
 
-function saveLeads() {
-  localStorage.setItem('hingeLeads_v2', JSON.stringify(leads));
+async function saveLead(lead) {
+  try {
+    await db.collection('leads').doc(String(lead.id)).set(lead);
+  } catch(e) {
+    console.error('saveLead error:', e);
+  }
 }
 
 function touchLead(lead) {
@@ -2153,12 +2267,15 @@ let researchData = {}; // keyed by leadId -> { states: { stateName: htmlContent 
 let stateResearchCache = {}; // keyed by state abbreviation -> html (shared across all leads)
 
 function loadStateCache() {
-  const stored = localStorage.getItem('hingeStateResearch_v1');
-  stateResearchCache = stored ? JSON.parse(stored) : {};
+  // Handled by initFromFirestore()
 }
 
-function saveStateCache() {
-  localStorage.setItem('hingeStateResearch_v1', JSON.stringify(stateResearchCache));
+async function saveStateCache() {
+  try {
+    await db.collection('config').doc('stateResearch').set({ cache: stateResearchCache });
+  } catch(e) {
+    console.error('saveStateCache error:', e);
+  }
 }
 
 function switchModalTab(tab) {
@@ -2242,7 +2359,7 @@ function updateStage() {
   const newStage = document.getElementById('modalStageSelect').value;
   l.stage = newStage;
   touchLead(l);
-  saveLeads();
+  saveLead(l);
   document.getElementById('lastActionDisplay').textContent = 'Last action: today';
   document.getElementById('stageSavedMsg').style.display = 'inline';
   setTimeout(() => document.getElementById('stageSavedMsg').style.display = 'none', 2000);
@@ -2257,7 +2374,7 @@ function saveNote() {
   if (!l.addedNotes) l.addedNotes = [];
   l.addedNotes.push({ date: now, text });
   touchLead(l);
-  saveLeads();
+  saveLead(l);
   document.getElementById('newNoteInput').value = '';
   document.getElementById('noteSavedMsg').style.display = 'block';
   setTimeout(() => document.getElementById('noteSavedMsg').style.display = 'none', 2000);
@@ -2324,7 +2441,7 @@ function saveEdit() {
   l.followUpNotes = document.getElementById('ef-followUpNotes').value.trim();
   l.otherNotes = document.getElementById('ef-otherNotes').value.trim();
   touchLead(l);
-  saveLeads();
+  saveLead(l);
   // Update header
   document.getElementById('modalName').textContent = `${l.firstName} ${l.lastName}`;
   document.getElementById('modalCompany').textContent = l.company + (l.title ? ` · ${l.title}` : '');
@@ -2355,7 +2472,7 @@ function initResearchTab() {
     states.forEach(s => { if (stateResearchCache[s]) fromCache[s] = stateResearchCache[s]; });
     if (Object.keys(fromCache).length > 0) {
       l.researchSheets = fromCache;
-      saveLeads();
+      saveLead(l);
       saved = fromCache;
     }
   }
@@ -2444,7 +2561,7 @@ async function runResearch() {
     }
   }
 
-  saveLeads();
+  saveLead(l);
   document.getElementById('researchLoading').classList.remove('visible');
   document.getElementById('runResearchBtn').disabled = false;
   document.getElementById('researchBtnLabel').textContent = 'Re-run Research';
@@ -2776,7 +2893,7 @@ Start with "Subject: [subject line]" then a blank line then the email. Write onl
           text
         });
         touchLead(logLead);
-        saveLeads();
+        saveLead(logLead);
         showToast('Email generated & saved to log!');
       }
     }
@@ -2951,7 +3068,7 @@ function onDrop(e) {
   const oldStage = lead.stage;
   lead.stage = newStage;
   touchLead(lead);
-  saveLeads();
+  saveLead(lead);
   updateStats();
   showToast(`${lead.firstName} moved to ${STAGES.find(s => s.id === newStage)?.label}`);
   // Smooth DOM update — move card without full re-render
@@ -3114,7 +3231,7 @@ function saveNewLead() {
     stage: document.getElementById('al-stage').value,
     lastActionAt: new Date().toISOString(),
   });
-  saveLeads();
+  saveLead(leads[leads.length - 1]);
   updateStats();
   if (currentView === 'kanban') renderKanban(); else renderTable();
   populateEmailLeadSelect();
@@ -3328,13 +3445,120 @@ function executeImport() {
   showToast(msg);
 }
 
+// ==================== FIREBASE ====================
+const firebaseConfig = {
+  apiKey: "AIzaSyC3SYUxvZWXKp1E-eZDtmv4XSiMaW7HTok",
+  authDomain: "kp-pipeline.firebaseapp.com",
+  projectId: "kp-pipeline",
+  storageBucket: "kp-pipeline.firebasestorage.app",
+  messagingSenderId: "343438201415",
+  appId: "1:343438201415:web:ca65d6d5a8c91ecc669762"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let unsubscribeLeads = null;
+
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(e => {
+    console.error('Sign-in error:', e);
+    showToast('Sign-in failed — try again');
+  });
+}
+
+function doSignOut() {
+  if (unsubscribeLeads) { unsubscribeLeads(); unsubscribeLeads = null; }
+  auth.signOut();
+}
+
+auth.onAuthStateChanged(user => {
+  const overlay = document.getElementById('signInOverlay');
+  const userMenu = document.getElementById('userMenu');
+  if (user) {
+    overlay.style.display = 'none';
+    document.getElementById('userPhoto').src = user.photoURL || '';
+    document.getElementById('userName').textContent = user.displayName || user.email;
+    userMenu.style.display = 'flex';
+    initFromFirestore();
+  } else {
+    overlay.style.display = 'flex';
+    userMenu.style.display = 'none';
+    leads = [];
+    if (unsubscribeLeads) { unsubscribeLeads(); unsubscribeLeads = null; }
+  }
+});
+
+async function migrateFromLocalStorage() {
+  const stored = localStorage.getItem('hingeLeads_v2');
+  if (!stored) return;
+  try {
+    const localLeads = JSON.parse(stored);
+    if (!localLeads || !localLeads.length) return;
+    console.log(`Migrating ${localLeads.length} leads from localStorage to Firestore...`);
+    // Firestore batch limit is 500; chunk if needed
+    const chunkSize = 499;
+    for (let i = 0; i < localLeads.length; i += chunkSize) {
+      const batch = db.batch();
+      localLeads.slice(i, i + chunkSize).forEach(lead => {
+        batch.set(db.collection('leads').doc(String(lead.id)), lead);
+      });
+      await batch.commit();
+    }
+    const researchStored = localStorage.getItem('hingeStateResearch_v1');
+    if (researchStored) {
+      await db.collection('config').doc('stateResearch').set({ cache: JSON.parse(researchStored) });
+      localStorage.removeItem('hingeStateResearch_v1');
+    }
+    localStorage.removeItem('hingeLeads_v2');
+    console.log('Migration complete.');
+    showToast('Your data has been migrated to the cloud!');
+  } catch(e) {
+    console.error('Migration error:', e);
+  }
+}
+
+async function initFromFirestore() {
+  // Migrate any existing localStorage data first
+  await migrateFromLocalStorage();
+
+  // Load state research cache
+  try {
+    const doc = await db.collection('config').doc('stateResearch').get();
+    if (doc.exists) stateResearchCache = doc.data().cache || {};
+  } catch(e) {
+    console.error('Error loading state cache:', e);
+  }
+
+  // Check if Firestore is empty — seed from RAW_LEADS
+  const snapshot = await db.collection('leads').limit(1).get();
+  if (snapshot.empty) {
+    const seedLeads = buildLeadsFromRaw();
+    const chunkSize = 499;
+    for (let i = 0; i < seedLeads.length; i += chunkSize) {
+      const batch = db.batch();
+      seedLeads.slice(i, i + chunkSize).forEach(lead => {
+        batch.set(db.collection('leads').doc(String(lead.id)), lead);
+      });
+      await batch.commit();
+    }
+  }
+
+  // Subscribe to real-time updates
+  unsubscribeLeads = db.collection('leads').orderBy('id').onSnapshot(snap => {
+    leads = snap.docs.map(d => d.data());
+    updateStats();
+    if (currentView === 'kanban') renderKanban(); else renderTable();
+    populateEmailLeadSelect();
+  }, err => {
+    console.error('Firestore snapshot error:', err);
+    showToast('Connection error — check your internet');
+  });
+}
+
 // ==================== INIT ====================
-initLeads();
-loadStateCache();
-updateStats();
-renderTable();
-populateEmailLeadSelect();
-// Re-render on resize (mobile <-> desktop switch)
 window.addEventListener('resize', () => {
   if (currentView === 'table') renderTable();
 });
